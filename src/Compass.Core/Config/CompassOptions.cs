@@ -26,4 +26,7 @@ public sealed class RecommenderConfig
     public int K { get; set; } = 5;
     public string ScorerMode { get; set; } = "NearestNeighbor";
     public Dictionary<string, double> CategoryWeights { get; set; } = new();
+    public double NegativeWeight { get; set; } = 0.0;
+    public bool UseImplicitNegatives { get; set; } = false;
+    public double HybridAlpha { get; set; } = 0.5;
 }
