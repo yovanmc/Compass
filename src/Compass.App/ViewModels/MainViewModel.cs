@@ -25,6 +25,8 @@ public sealed partial class MainViewModel : ObservableObject
     private bool isBusy;
 
     public IReadOnlyList<string> MissingSecrets { get; }
+    public bool HasMissingSecrets => MissingSecrets.Count > 0;
+    public bool IsEmpty => Recommendations.Count == 0;
 
     public MainViewModel(SyncService sync, ISyncStore store, RecommendationService recs, CompassOptions opts)
     {
