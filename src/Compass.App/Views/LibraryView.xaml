@@ -3,17 +3,553 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:controls="clr-namespace:Compass.App.Controls"
+      xmlns:vm="clr-namespace:Compass.App.ViewModels"
       mc:Ignorable="d"
-      Background="#0A0A0A">
+      Background="#0A0A0A"
+      d:DataContext="{d:DesignInstance vm:LibraryViewModel}">
 
     <Grid>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="Library"
-                       Foreground="#EAEAEA" FontSize="24" FontWeight="SemiBold"
-                       HorizontalAlignment="Center" Margin="0,0,0,8"/>
-            <TextBlock Text="Coming soon — browse your full game library."
-                       Foreground="#5F5F5F" FontSize="14"
-                       HorizontalAlignment="Center"/>
-        </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══ TOOLBAR ══════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0"
+                Background="#0D0D0D"
+                BorderBrush="#222" BorderThickness="0,0,0,1"
+                Padding="12,8">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+
+                <!-- Search box -->
+                <TextBox Width="200"
+                         Margin="0,0,8,0"
+                         Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
+                         Background="#141414"
+                         Foreground="#EAEAEA"
+                         BorderBrush="#2A2A2A"
+                         BorderThickness="1"
+                         CaretBrush="#4FC3F7"
+                         SelectionBrush="#4FC3F7"
+                         Padding="8,5"
+                         FontSize="13"
+                         VerticalContentAlignment="Center">
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="TextBox">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="{TemplateBinding BorderThickness}"
+                                                CornerRadius="4">
+                                            <Grid>
+                                                <!-- Placeholder -->
+                                                <TextBlock Text="Search games…"
+                                                           Foreground="#5F5F5F"
+                                                           FontSize="13"
+                                                           Margin="9,5,0,0"
+                                                           IsHitTestVisible="False"
+                                                           VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource TemplatedParent}}" Value="">
+                                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <ScrollViewer x:Name="PART_ContentHost"
+                                                              Margin="{TemplateBinding Padding}"
+                                                              VerticalAlignment="Center"/>
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
+
+                <!-- Status filter -->
+                <ComboBox ItemsSource="{Binding Statuses}"
+                          SelectedItem="{Binding SelectedStatus}"
+                          Width="110"
+                          Margin="0,0,8,0"
+                          Background="#141414"
+                          Foreground="#EAEAEA"
+                          BorderBrush="#2A2A2A"
+                          BorderThickness="1"
+                          Padding="8,5"
+                          FontSize="13">
+                    <ComboBox.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}">#141414</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">#1E3A4A</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}">#EAEAEA</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}">#EAEAEA</SolidColorBrush>
+                    </ComboBox.Resources>
+                </ComboBox>
+
+                <!-- Facet / genre filter -->
+                <ComboBox ItemsSource="{Binding Facets}"
+                          SelectedValue="{Binding SelectedFacet}"
+                          SelectedValuePath="Key"
+                          DisplayMemberPath="Label"
+                          Width="160"
+                          Margin="0,0,8,0"
+                          Background="#141414"
+                          Foreground="#EAEAEA"
+                          BorderBrush="#2A2A2A"
+                          BorderThickness="1"
+                          Padding="8,5"
+                          FontSize="13">
+                    <ComboBox.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}">#141414</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">#1E3A4A</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}">#EAEAEA</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}">#EAEAEA</SolidColorBrush>
+                    </ComboBox.Resources>
+                </ComboBox>
+
+                <!-- Sort -->
+                <ComboBox ItemsSource="{Binding Sorts}"
+                          SelectedItem="{Binding SelectedSort}"
+                          Width="130"
+                          Margin="0,0,8,0"
+                          Background="#141414"
+                          Foreground="#EAEAEA"
+                          BorderBrush="#2A2A2A"
+                          BorderThickness="1"
+                          Padding="8,5"
+                          FontSize="13">
+                    <ComboBox.Resources>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}">#141414</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">#1E3A4A</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}">#EAEAEA</SolidColorBrush>
+                        <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}">#EAEAEA</SolidColorBrush>
+                    </ComboBox.Resources>
+                </ComboBox>
+
+                <!-- Rows / Poster toggle -->
+                <Border Background="#141414"
+                        BorderBrush="#2A2A2A" BorderThickness="1"
+                        CornerRadius="4"
+                        Height="30">
+                    <StackPanel Orientation="Horizontal">
+                        <!-- Row view button -->
+                        <ToggleButton IsChecked="{Binding IsPosterView, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
+                                      Command="{x:Null}"
+                                      Click="RowViewButton_Click"
+                                      Width="36"
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      Foreground="#EAEAEA"
+                                      FontSize="13"
+                                      ToolTip="Row view"
+                                      Padding="0"
+                                      Cursor="Hand">
+                            <ToggleButton.Style>
+                                <Style TargetType="ToggleButton">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Border x:Name="Bd"
+                                                        Background="Transparent"
+                                                        CornerRadius="3"
+                                                        Width="34" Height="28">
+                                                    <TextBlock Text="☰"
+                                                               FontSize="14"
+                                                               Foreground="#8A8A8A"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               x:Name="Lbl"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="#222"/>
+                                                        <Setter TargetName="Lbl" Property="Foreground" Value="#4FC3F7"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Lbl" Property="Foreground" Value="#EAEAEA"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+                        <!-- Poster view button -->
+                        <ToggleButton IsChecked="{Binding IsPosterView, Mode=OneWay}"
+                                      Command="{x:Null}"
+                                      Click="PosterViewButton_Click"
+                                      Width="36"
+                                      Background="Transparent"
+                                      BorderThickness="0"
+                                      Foreground="#EAEAEA"
+                                      FontSize="13"
+                                      ToolTip="Poster view"
+                                      Padding="0"
+                                      Cursor="Hand">
+                            <ToggleButton.Style>
+                                <Style TargetType="ToggleButton">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="ToggleButton">
+                                                <Border x:Name="Bd"
+                                                        Background="Transparent"
+                                                        CornerRadius="3"
+                                                        Width="34" Height="28">
+                                                    <TextBlock Text="⊞"
+                                                               FontSize="14"
+                                                               Foreground="#8A8A8A"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               x:Name="Lbl"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsChecked" Value="True">
+                                                        <Setter TargetName="Bd" Property="Background" Value="#222"/>
+                                                        <Setter TargetName="Lbl" Property="Foreground" Value="#4FC3F7"/>
+                                                    </Trigger>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="Lbl" Property="Foreground" Value="#EAEAEA"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </ToggleButton.Style>
+                        </ToggleButton>
+                    </StackPanel>
+                </Border>
+
+            </WrapPanel>
+        </Border>
+
+        <!-- ═══ CONTENT ══════════════════════════════════════════════════════ -->
+        <Grid Grid.Row="1">
+
+            <!-- Empty state (shown when Rows is empty) -->
+            <TextBlock Text="No games match."
+                       Foreground="#5F5F5F"
+                       FontSize="13"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Rows.Count}" Value="0">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+
+            <!-- ── COMPACT ROW VIEW (IsPosterView = false) ───────────────── -->
+            <ListBox ItemsSource="{Binding Rows}"
+                     SelectedItem="{Binding SelectedRow}"
+                     Background="Transparent"
+                     BorderThickness="0"
+                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     VirtualizingPanel.IsVirtualizing="True"
+                     VirtualizingPanel.VirtualizationMode="Recycling"
+                     Padding="12,6,12,12"
+                     Focusable="False">
+                <ListBox.Style>
+                    <Style TargetType="ListBox">
+                        <Setter Property="Visibility" Value="Visible"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPosterView}" Value="True">
+                                <Setter Property="Visibility" Value="Collapsed"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.Style>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem">
+                        <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0,0,0,4"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="ListBoxItem">
+                                    <Border x:Name="Bd"
+                                            Background="#141414"
+                                            BorderBrush="#222" BorderThickness="1"
+                                            CornerRadius="6"
+                                            Padding="10,8">
+                                        <ContentPresenter/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter TargetName="Bd" Property="BorderBrush" Value="#4FC3F7"/>
+                                            <Setter TargetName="Bd" Property="Background" Value="#0F1E28"/>
+                                        </Trigger>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="#1A1A1A"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type vm:GameRow}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <!-- Cover placeholder -->
+                                <ColumnDefinition Width="Auto"/>
+                                <!-- Name + tags -->
+                                <ColumnDefinition Width="*"/>
+                                <!-- Right side: status pill + score -->
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Cover placeholder block (46×64) -->
+                            <Border Grid.Column="0"
+                                    Width="46" Height="64"
+                                    Background="#222"
+                                    CornerRadius="3"
+                                    Margin="0,0,10,0"
+                                    VerticalAlignment="Center"/>
+
+                            <!-- Name + feature tags -->
+                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Name, Mode=OneWay}"
+                                           Foreground="#EAEAEA"
+                                           FontSize="13"
+                                           FontWeight="Medium"
+                                           TextWrapping="Wrap"
+                                           LineHeight="18"/>
+                                <TextBlock Foreground="#8A8A8A"
+                                           FontSize="11"
+                                           Margin="0,3,0,0"
+                                           TextWrapping="Wrap"
+                                           LineHeight="15">
+                                    <Run Text="{Binding PlaytimeDisplay, Mode=OneWay}"/>
+                                </TextBlock>
+                            </StackPanel>
+
+                            <!-- Status pill + score -->
+                            <StackPanel Grid.Column="2"
+                                        Orientation="Vertical"
+                                        VerticalAlignment="Center"
+                                        HorizontalAlignment="Right"
+                                        Margin="10,0,0,0">
+
+                                <!-- Status pill -->
+                                <Border CornerRadius="10"
+                                        Padding="7,2"
+                                        HorizontalAlignment="Right"
+                                        Margin="0,0,0,6">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#2A2A2A"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Status}" Value="Played">
+                                                    <Setter Property="Background" Value="#1A3320"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Backlog">
+                                                    <Setter Property="Background" Value="#1E2840"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Unmatched">
+                                                    <Setter Property="Background" Value="#2A2010"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Status}" Value="Hidden">
+                                                    <Setter Property="Background" Value="#2A1A1A"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding Status, Mode=OneWay}"
+                                               FontSize="10"
+                                               FontWeight="Medium">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#5F5F5F"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Played">
+                                                        <Setter Property="Foreground" Value="#4CAF50"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Backlog">
+                                                        <Setter Property="Foreground" Value="#4FC3F7"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Unmatched">
+                                                        <Setter Property="Foreground" Value="#EBB740"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Hidden">
+                                                        <Setter Property="Foreground" Value="#8A4A4A"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Border>
+
+                                <!-- Score (gold, NN%) — only shown when score > 0 -->
+                                <TextBlock HorizontalAlignment="Right"
+                                           Foreground="#EBB740"
+                                           FontSize="12"
+                                           FontWeight="SemiBold">
+                                    <TextBlock.Style>
+                                        <Style TargetType="TextBlock">
+                                            <Setter Property="Visibility" Value="Visible"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding ScorePercent}" Value="0">
+                                                    <Setter Property="Visibility" Value="Collapsed"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </TextBlock.Style>
+                                    <Run Text="{Binding ScorePercent, Mode=OneWay}"/>
+                                    <Run Text="%"/>
+                                </TextBlock>
+
+                            </StackPanel>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- ── POSTER GRID VIEW (IsPosterView = true) ────────────────── -->
+            <ScrollViewer Background="Transparent"
+                          VerticalScrollBarVisibility="Auto"
+                          Padding="12,6,12,12">
+                <ScrollViewer.Style>
+                    <Style TargetType="ScrollViewer">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPosterView}" Value="True">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </ScrollViewer.Style>
+                <ItemsControl ItemsSource="{Binding Rows}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:GameRow}">
+                            <Border Width="210"
+                                    Margin="0,0,10,10"
+                                    Background="#141414"
+                                    BorderBrush="#242424" BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="10,10,10,12"
+                                    Cursor="Hand">
+                                <Border.InputBindings>
+                                    <MouseBinding MouseAction="LeftClick"
+                                                  Command="{x:Null}"/>
+                                </Border.InputBindings>
+                                <StackPanel>
+                                    <!-- Cover placeholder -->
+                                    <Border Width="190" Height="100"
+                                            Background="#222"
+                                            CornerRadius="4"
+                                            Margin="0,0,0,8"/>
+
+                                    <!-- Name + score row -->
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Name, Mode=OneWay}"
+                                                   Foreground="#EAEAEA"
+                                                   FontSize="13"
+                                                   FontWeight="Medium"
+                                                   TextWrapping="Wrap"
+                                                   LineHeight="18"
+                                                   Margin="0,0,8,0"/>
+
+                                        <controls:ScoreRing Grid.Column="1"
+                                                            Percent="{Binding ScorePercent, Mode=OneWay}"
+                                                            VerticalAlignment="Top">
+                                            <controls:ScoreRing.Style>
+                                                <Style TargetType="controls:ScoreRing">
+                                                    <Setter Property="Visibility" Value="Visible"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding ScorePercent}" Value="0">
+                                                            <Setter Property="Visibility" Value="Collapsed"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </controls:ScoreRing.Style>
+                                        </controls:ScoreRing>
+                                    </Grid>
+
+                                    <!-- Status pill -->
+                                    <Border CornerRadius="10"
+                                            Padding="7,2"
+                                            HorizontalAlignment="Left"
+                                            Margin="0,6,0,0">
+                                        <Border.Style>
+                                            <Style TargetType="Border">
+                                                <Setter Property="Background" Value="#2A2A2A"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Played">
+                                                        <Setter Property="Background" Value="#1A3320"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Backlog">
+                                                        <Setter Property="Background" Value="#1E2840"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Unmatched">
+                                                        <Setter Property="Background" Value="#2A2010"/>
+                                                    </DataTrigger>
+                                                    <DataTrigger Binding="{Binding Status}" Value="Hidden">
+                                                        <Setter Property="Background" Value="#2A1A1A"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Border.Style>
+                                        <TextBlock Text="{Binding Status, Mode=OneWay}"
+                                                   FontSize="10"
+                                                   FontWeight="Medium">
+                                            <TextBlock.Style>
+                                                <Style TargetType="TextBlock">
+                                                    <Setter Property="Foreground" Value="#5F5F5F"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Played">
+                                                            <Setter Property="Foreground" Value="#4CAF50"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Backlog">
+                                                            <Setter Property="Foreground" Value="#4FC3F7"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Unmatched">
+                                                            <Setter Property="Foreground" Value="#EBB740"/>
+                                                        </DataTrigger>
+                                                        <DataTrigger Binding="{Binding Status}" Value="Hidden">
+                                                            <Setter Property="Foreground" Value="#8A4A4A"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </TextBlock.Style>
+                                        </TextBlock>
+                                    </Border>
+                                </StackPanel>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
+        </Grid>
     </Grid>
 </Page>
