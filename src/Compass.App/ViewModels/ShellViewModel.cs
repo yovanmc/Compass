@@ -29,6 +29,13 @@ public sealed partial class ShellViewModel : ObservableObject
     partial void OnActiveDetailChanged(DetailViewModel? value)
         => OnPropertyChanged(nameof(IsDetailOpen));
 
+    // Detach the replaced panel's re-open handler so its event lifecycle is
+    // symmetric with the subscribe in OnGameChosen (no dangling subscriptions).
+    partial void OnActiveDetailChanging(DetailViewModel? oldValue, DetailViewModel? newValue)
+    {
+        if (oldValue is not null) oldValue.GameChosen -= OnGameChosen;
+    }
+
     public IReadOnlyList<string> MissingSecrets { get; }
     public bool HasMissingSecrets => MissingSecrets.Count > 0;
 
