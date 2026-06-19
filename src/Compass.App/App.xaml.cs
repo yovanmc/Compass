@@ -77,6 +77,12 @@ public partial class App : Application
 
         sc.AddSingleton<ISyncStore>(sp => new SqliteSyncStore(sp.GetRequiredService<CompassDb>()));
 
+        // Settings persistence infrastructure
+        sc.AddSingleton<ISettingsStore>(sp => new SettingsRepository(sp.GetRequiredService<CompassDb>()));
+        sc.AddSingleton(sp => new RecommenderSettingsService(sp.GetRequiredService<ISettingsStore>()));
+        sc.AddSingleton(sp => new RecommenderConfigState(
+            sp.GetRequiredService<RecommenderSettingsService>().Load(options.Recommender)));
+
         sc.AddSingleton(sp => new SyncService(
             sp.GetRequiredService<ISteamClient>(),
             sp.GetRequiredService<IIgdbClient>(),
@@ -96,6 +102,7 @@ public partial class App : Application
         sc.AddSingleton<RecommendViewModel>();
         sc.AddSingleton<LibraryViewModel>();
         sc.AddSingleton<DetailViewModelFactory>();
+        sc.AddSingleton<SettingsViewModel>();
         sc.AddSingleton<ShellViewModel>();
 
         // Pages — registered so PageProvider can resolve them from DI

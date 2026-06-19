@@ -3,17 +3,453 @@
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="clr-namespace:Compass.App.ViewModels"
       mc:Ignorable="d"
-      Background="#0A0A0A">
+      Background="#0A0A0A"
+      d:DataContext="{d:DesignInstance vm:SettingsViewModel}">
 
-    <Grid>
-        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-            <TextBlock Text="Settings"
-                       Foreground="#EAEAEA" FontSize="24" FontWeight="SemiBold"
-                       HorizontalAlignment="Center" Margin="0,0,0,8"/>
-            <TextBlock Text="Coming soon — tune recommender weights and knobs."
-                       Foreground="#5F5F5F" FontSize="14"
-                       HorizontalAlignment="Center"/>
+    <ScrollViewer VerticalScrollBarVisibility="Auto"
+                  Padding="32,24,32,32">
+        <StackPanel MaxWidth="560" HorizontalAlignment="Left">
+
+            <!-- ── Header ─────────────────────────────────────────────────── -->
+            <TextBlock Text="Recommender Settings"
+                       Foreground="#EAEAEA"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,4"/>
+            <TextBlock Text="Knobs take effect immediately — Recommend and Library pages re-rank on every change."
+                       Foreground="#5F5F5F"
+                       FontSize="13"
+                       TextWrapping="Wrap"
+                       Margin="0,0,0,24"/>
+
+            <!-- ── Section: Scoring ───────────────────────────────────────── -->
+            <TextBlock Text="SCORING"
+                       Foreground="#5F5F5F"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,12"/>
+
+            <!-- Played floor -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Played floor (minutes)"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,2"/>
+                        <TextBlock Text="Games below this playtime are treated as unplayed for scoring."
+                                   Foreground="#5F5F5F"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="0" Maximum="600"
+                                Value="{Binding PlayedFloorMinutes}"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="10"
+                                SmallChange="10"
+                                LargeChange="60"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding PlayedFloorMinutes, Mode=OneWay}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="36"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- Neighbors (k) -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Neighbors (k)"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,2"/>
+                        <TextBlock Text="Number of played games used as taste profile anchors."
+                                   Foreground="#5F5F5F"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="1" Maximum="20"
+                                Value="{Binding K}"
+                                IsSnapToTickEnabled="True"
+                                TickFrequency="1"
+                                SmallChange="1"
+                                LargeChange="5"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding K, Mode=OneWay}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="36"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- Scorer mode -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <StackPanel>
+                    <TextBlock Text="Scorer mode"
+                               Foreground="#EAEAEA"
+                               FontSize="13"
+                               Margin="0,0,0,2"/>
+                    <TextBlock Text="NearestNeighbor: average of k closest played games. Centroid: single mean vector. Hybrid: blend of both."
+                               Foreground="#5F5F5F"
+                               FontSize="11"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,8"/>
+                    <ComboBox ItemsSource="{Binding ScorerModes}"
+                              SelectedItem="{Binding SelectedScorerMode}"
+                              Width="200"
+                              HorizontalAlignment="Left"
+                              Background="#141414"
+                              Foreground="#EAEAEA"
+                              BorderBrush="#2A2A2A"
+                              BorderThickness="1"
+                              Padding="8,5"
+                              FontSize="13">
+                        <ComboBox.Resources>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}">#141414</SolidColorBrush>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}">#1E3A4A</SolidColorBrush>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}">#EAEAEA</SolidColorBrush>
+                            <SolidColorBrush x:Key="{x:Static SystemColors.ControlTextBrushKey}">#EAEAEA</SolidColorBrush>
+                        </ComboBox.Resources>
+                    </ComboBox>
+                </StackPanel>
+            </Border>
+
+            <!-- Hybrid alpha — only visible when Hybrid mode selected -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6"
+                    Visibility="{Binding IsHybrid, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Hybrid alpha (α)"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,2"/>
+                        <TextBlock Text="Blend weight: 0 = pure Centroid, 1 = pure NearestNeighbor."
+                                   Foreground="#5F5F5F"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="0" Maximum="1"
+                                Value="{Binding HybridAlpha}"
+                                SmallChange="0.05"
+                                LargeChange="0.1"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding HybridAlpha, Mode=OneWay, StringFormat={}{0:0.00}}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="40"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- ── Section: Category weights ─────────────────────────────── -->
+            <TextBlock Text="CATEGORY WEIGHTS"
+                       Foreground="#5F5F5F"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Margin="0,18,0,12"/>
+
+            <!-- Genre weight -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Genre weight"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="0" Maximum="2"
+                                Value="{Binding WeightGenre}"
+                                SmallChange="0.1"
+                                LargeChange="0.5"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding WeightGenre, Mode=OneWay, StringFormat={}{0:0.00}}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="40"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- Theme weight -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Theme weight"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="0" Maximum="2"
+                                Value="{Binding WeightTheme}"
+                                SmallChange="0.1"
+                                LargeChange="0.5"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding WeightTheme, Mode=OneWay, StringFormat={}{0:0.00}}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="40"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- Mode weight -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Mode weight"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="0" Maximum="2"
+                                Value="{Binding WeightMode}"
+                                SmallChange="0.1"
+                                LargeChange="0.5"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding WeightMode, Mode=OneWay, StringFormat={}{0:0.00}}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="40"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- Keyword weight -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Keyword weight"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="0" Maximum="2"
+                                Value="{Binding WeightKeyword}"
+                                SmallChange="0.1"
+                                LargeChange="0.5"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding WeightKeyword, Mode=OneWay, StringFormat={}{0:0.00}}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="40"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- ── Section: Negative signals ──────────────────────────────── -->
+            <TextBlock Text="NEGATIVE SIGNALS"
+                       Foreground="#5F5F5F"
+                       FontSize="11"
+                       FontWeight="SemiBold"
+                       Margin="0,18,0,12"/>
+
+            <!-- Negative weight -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Negative weight (λ)"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,2"/>
+                        <TextBlock Text="How strongly hidden/disliked games push recommendations away."
+                                   Foreground="#5F5F5F"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="0" Maximum="2"
+                                Value="{Binding NegativeWeight}"
+                                SmallChange="0.05"
+                                LargeChange="0.25"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding NegativeWeight, Mode=OneWay, StringFormat={}{0:0.00}}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="40"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
+            <!-- Use implicit negatives -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,12"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Use implicit negatives"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,2"/>
+                        <TextBlock Text="Treat owned games with zero playtime as soft negative signals."
+                                   Foreground="#5F5F5F"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <CheckBox Grid.Column="1"
+                              IsChecked="{Binding UseImplicitNegatives}"
+                              VerticalAlignment="Center"
+                              Margin="14,0,0,0"
+                              Foreground="#EAEAEA"/>
+                </Grid>
+            </Border>
+
+            <!-- ── Reset button ───────────────────────────────────────────── -->
+            <Button Command="{Binding ResetCommand}"
+                    Cursor="Hand"
+                    Padding="14,8"
+                    FontSize="13"
+                    HorizontalAlignment="Left"
+                    BorderThickness="1"
+                    Margin="0,20,0,0">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background" Value="#141414"/>
+                        <Setter Property="Foreground" Value="#8A8A8A"/>
+                        <Setter Property="BorderBrush" Value="#2A2A2A"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="Bd"
+                                            Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="6"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="#1E1E1E"/>
+                                            <Setter TargetName="Bd" Property="BorderBrush" Value="#3A3A3A"/>
+                                        </Trigger>
+                                        <Trigger Property="IsPressed" Value="True">
+                                            <Setter TargetName="Bd" Property="Background" Value="#0A0A0A"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+                <TextBlock Text="Reset to defaults"
+                           Foreground="#8A8A8A"/>
+            </Button>
+
         </StackPanel>
-    </Grid>
+    </ScrollViewer>
 </Page>

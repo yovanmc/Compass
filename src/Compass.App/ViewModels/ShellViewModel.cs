@@ -13,6 +13,7 @@ public sealed partial class ShellViewModel : ObservableObject
 
     public RecommendViewModel Recommend { get; }
     public LibraryViewModel Library { get; }
+    public SettingsViewModel Settings { get; }
 
     [ObservableProperty]
     private string statusText = "Ready.";
@@ -35,6 +36,7 @@ public sealed partial class ShellViewModel : ObservableObject
         SyncService sync,
         RecommendViewModel recommend,
         LibraryViewModel library,
+        SettingsViewModel settings,
         CompassOptions opts,
         DetailViewModelFactory detailFactory)
     {
@@ -43,11 +45,19 @@ public sealed partial class ShellViewModel : ObservableObject
         _detailFactory = detailFactory;
         Recommend      = recommend;
         Library        = library;
+        Settings       = settings;
         MissingSecrets = SecretsGuard.FindMissing(opts);
 
         // Subscribe to game-chosen events from both pages
         Recommend.GameChosen += OnGameChosen;
         Library.GameChosen   += OnGameChosen;
+
+        // Re-rank both pages whenever a Settings knob changes
+        Settings.ConfigChanged += () =>
+        {
+            Recommend.RefreshFromStore();
+            Library.RefreshFromStore();
+        };
 
         // Seed the status line with initial counts if data is already in store
         if (Recommend.Recommendations.Count > 0 || Recommend.Unmatched.Count > 0)
