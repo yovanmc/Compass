@@ -26,3 +26,17 @@ for scope and architecture.
 Secrets are **never** committed. Development uses .NET User Secrets (see the design doc and
 the `dotnet user-secrets set` block left in the app project). Your SteamID64 is not a secret
 and lives in `appsettings.json`.
+
+## Local setup (run once)
+
+Inject real keys via .NET User Secrets (stored outside the repo). Run from `src/Compass.App`:
+
+```bash
+dotnet user-secrets set "Steam:ApiKey"      "YOUR_STEAM_WEB_API_KEY"
+dotnet user-secrets set "Igdb:ClientId"     "YOUR_TWITCH_CLIENT_ID"
+dotnet user-secrets set "Igdb:ClientSecret" "YOUR_TWITCH_CLIENT_SECRET"
+```
+
+Get keys: Steam Web API key at https://steamcommunity.com/dev/apikey ; IGDB uses a Twitch
+dev app (Client ID + Secret) at https://dev.twitch.tv/console/apps. SteamID64 is already set
+(non-secret) in `appsettings.json`.
