@@ -5,11 +5,13 @@ namespace Compass.Data.Db;
 
 public sealed class SqliteSyncStore : ISyncStore
 {
+    private readonly CompassDb _db;
     private readonly GameRepository _games;
     private readonly SyncLogRepository _log;
 
     public SqliteSyncStore(CompassDb db)
     {
+        _db = db;
         _games = new GameRepository(db);
         _log = new SyncLogRepository(db);
     }
@@ -49,4 +51,10 @@ public sealed class SqliteSyncStore : ISyncStore
 
     public void SetNotInterested(int appId, bool value)
         => _games.SetNotInterested(appId, value);
+
+    public void LoadSampleData(IReadOnlyList<SampleGame> games)
+        => new SampleDataProvider(_db).Load(games);
+
+    public void ClearLibrary()
+        => _games.ClearLibrary();
 }

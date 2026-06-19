@@ -147,6 +147,31 @@ sealed class InMemoryStore : ISyncStore
 
     public void SetNotInterested(int appId, bool value)
         => _notInterested[appId] = value;
+
+    public void LoadSampleData(IReadOnlyList<SampleGame> games)
+    {
+        // Minimal in-memory implementation: upsert owned rows and record matches+features
+        // for matched games. Keeps existing SyncService tests green without a real DB.
+        foreach (var g in games)
+        {
+            _owned[g.AppId] = (g.Name, g.PlaytimeForeverMin, g.Playtime2WeeksMin);
+
+            if (g.IgdbName is not null && g.FeatureKeys.Count > 0)
+            {
+                long igdbId = 1_000_000L + g.AppId;
+                _matches[g.AppId] = (igdbId, g.IgdbName, "appid", 1.0);
+                _features[igdbId] = g.FeatureKeys.ToList();
+            }
+        }
+    }
+
+    public void ClearLibrary()
+    {
+        _owned.Clear();
+        _matches.Clear();
+        _features.Clear();
+        // _notInterested and _log are deliberately left intact (mirrors SQL behaviour).
+    }
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────

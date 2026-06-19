@@ -173,6 +173,28 @@ public sealed class GameRepository
         return list;
     }
 
+    /// <summary>
+    /// Deletes all owned-data rows from the four core tables inside one transaction.
+    /// The <c>settings</c> and <c>sync_log</c> tables are intentionally left intact.
+    /// </summary>
+    public void ClearLibrary()
+    {
+        using var conn = _db.OpenConnection();
+        using var tx = conn.BeginTransaction();
+
+        // Order matters: game_features and features reference igdb_games,
+        // and games references igdb_id — delete children before parents.
+        foreach (var table in new[] { "game_features", "features", "igdb_games", "games" })
+        {
+            using var cmd = conn.CreateCommand();
+            cmd.Transaction = tx;
+            cmd.CommandText = $"DELETE FROM {table}";
+            cmd.ExecuteNonQuery();
+        }
+
+        tx.Commit();
+    }
+
     private static MatchMethod ParseMethod(string s) => s switch
     {
         "appid" => MatchMethod.AppId,
