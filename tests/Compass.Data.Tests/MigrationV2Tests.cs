@@ -13,7 +13,7 @@ public class MigrationV2Tests
     }
 
     [Fact]
-    public void FreshDb_IsVersion2_WithNewObjects()
+    public void FreshDb_IsCurrentVersion_WithNewObjects()
     {
         var p = TempDb();
         try
@@ -53,7 +53,7 @@ public class MigrationV2Tests
             }
             SqliteConnection.ClearAllPools();
 
-            var db = new CompassDb(p); db.Initialize(); // should migrate 1 -> 2
+            var db = new CompassDb(p); db.Initialize(); // should migrate 1 -> 3 (both additive steps)
             using var c2 = db.OpenConnection();
             using var ver = c2.CreateCommand(); ver.CommandText = "PRAGMA user_version";
             Convert.ToInt32(ver.ExecuteScalar()).Should().Be(3);
