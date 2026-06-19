@@ -5,14 +5,19 @@ public sealed class ContentRecommender : IRecommender
     public RankedResult Recommend(
         IReadOnlyList<ProfileItem> liked,
         IReadOnlyList<CandidateItem> candidates,
-        RecommenderOptions options)
+        RecommenderOptions options,
+        IReadOnlyList<ProfileItem>? disliked = null)
     {
+        disliked ??= Array.Empty<ProfileItem>();
+
         if (liked.Count == 0 || candidates.Count == 0)
             return new RankedResult(Array.Empty<Recommendation>());
 
-        // Fit IDF over the combined corpus so weights reflect the whole library.
-        var corpus = new List<FeatureVector>(liked.Count + candidates.Count);
+        // Fit IDF over the combined corpus (liked + disliked + candidates) so weights
+        // reflect the whole library including items the user doesn't want.
+        var corpus = new List<FeatureVector>(liked.Count + disliked.Count + candidates.Count);
         corpus.AddRange(liked.Select(l => l.Features));
+        corpus.AddRange(disliked.Select(d => d.Features));
         corpus.AddRange(candidates.Select(c => c.Features));
         var idf = IdfModel.Fit(corpus, options);
 
@@ -25,6 +30,14 @@ public sealed class ContentRecommender : IRecommender
         }
         if (likedVecs.Count == 0)
             return new RankedResult(Array.Empty<Recommendation>());
+
+        // Pre-weight disliked vectors.
+        var dislikedVecs = new List<(string id, double affinity, Dictionary<string, double> vec)>();
+        foreach (var d in disliked)
+        {
+            var v = idf.WeightNormalized(d.Features);
+            if (v.Count > 0 && d.Affinity > 0) dislikedVecs.Add((d.ItemId, d.Affinity, v));
+        }
 
         // Centroid (affinity-weighted, normalized) — used for hybrid + feature attribution.
         var centroidRaw = new Dictionary<string, double>();
@@ -40,33 +53,31 @@ public sealed class ContentRecommender : IRecommender
             if (cv.Count == 0)
             {
                 recs.Add(new Recommendation(c.ItemId, 0,
-                    Array.Empty<FeatureContribution>(), Array.Empty<string>()));
+                    Array.Empty<FeatureContribution>(), Array.Empty<string>(), Array.Empty<string>()));
                 continue;
             }
 
-            // similarity to each liked item
-            var sims = likedVecs
-                .Select(l => (l.id, l.affinity, sim: VectorMath.Dot(cv, l.vec)))
-                .OrderByDescending(t => t.sim)
-                .ToList();
-
-            var topK = sims.Take(options.K).Where(t => t.sim > 0).ToList();
-
-            double knn = 0;
-            if (topK.Count > 0)
-            {
-                double num = topK.Sum(t => t.affinity * t.sim);
-                double den = topK.Sum(t => t.affinity);
-                knn = den > 0 ? num / den : 0;
-            }
+            // Positive kNN (affinity-weighted, preserves v1 numbers exactly).
+            var (knn, neighbors) = AffinityKnn(cv, likedVecs, options.K, options.MaxExplanationNeighbors);
 
             double centroidSim = VectorMath.Dot(cv, centroid);
-            double score = options.Mode switch
+            double positiveScore = options.Mode switch
             {
                 ScorerMode.Centroid => centroidSim,
                 ScorerMode.Hybrid => options.HybridAlpha * centroidSim + (1 - options.HybridAlpha) * knn,
                 _ => knn
             };
+
+            // Negative penalty (same affinity-weighted top-k routine against disliked).
+            double negSim = 0;
+            List<string> penalizedBy = new();
+            if (dislikedVecs.Count > 0 && options.NegativeWeight > 0)
+            {
+                (negSim, penalizedBy) = AffinityKnn(cv, dislikedVecs, options.K, options.MaxExplanationNeighbors);
+                if (negSim <= 0) penalizedBy = new List<string>();
+            }
+
+            double finalScore = Math.Max(0, positiveScore - options.NegativeWeight * negSim);
 
             // Feature attribution via centroid contribution.
             var contributions = cv
@@ -77,15 +88,36 @@ public sealed class ContentRecommender : IRecommender
                 .Take(options.MaxExplanationFeatures)
                 .ToList();
 
-            var neighbors = topK
-                .Take(options.MaxExplanationNeighbors)
-                .Select(t => t.id)
-                .ToList();
-
-            recs.Add(new Recommendation(c.ItemId, score, contributions, neighbors));
+            recs.Add(new Recommendation(c.ItemId, finalScore, contributions, neighbors, penalizedBy));
         }
 
         recs.Sort((a, b) => b.Score.CompareTo(a.Score));
         return new RankedResult(recs);
+    }
+
+    // Affinity-weighted kNN similarity. Returns (score, neighborIds).
+    // Used for both positive and negative profiles so the math is identical.
+    private static (double score, List<string> neighborIds) AffinityKnn(
+        Dictionary<string, double> cv,
+        List<(string id, double affinity, Dictionary<string, double> vec)> profile,
+        int k,
+        int maxNeighbors)
+    {
+        var sims = profile
+            .Select(p => (p.id, p.affinity, sim: VectorMath.Dot(cv, p.vec)))
+            .OrderByDescending(t => t.sim)
+            .ToList();
+
+        var topK = sims.Take(k).Where(t => t.sim > 0).ToList();
+
+        double score = 0;
+        if (topK.Count > 0)
+        {
+            double num = topK.Sum(t => t.affinity * t.sim);
+            double den = topK.Sum(t => t.affinity);
+            score = den > 0 ? num / den : 0;
+        }
+
+        return (score, topK.Take(maxNeighbors).Select(t => t.id).ToList());
     }
 }

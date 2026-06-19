@@ -111,4 +111,62 @@ public class ContentRecommenderTests
         var res = new ContentRecommender().Recommend(liked, candidates, Knn());
         res.Recommendations.Should().BeEmpty();
     }
+
+    [Fact]
+    public void EmptyDisliked_MatchesV1Behavior()
+    {
+        // A second candidate with a different feature ensures genre:strategy is not ubiquitous
+        // in the IDF corpus (not in 100% of docs), so its IDF stays positive.
+        var liked = new[] { new ProfileItem("L1", FeatureVector.FromKeys(new[] { "genre:strategy" }), 5) };
+        var cands = new[]
+        {
+            new CandidateItem("c",    FeatureVector.FromKeys(new[] { "genre:strategy", "genre:scifi" })),
+            new CandidateItem("other", FeatureVector.FromKeys(new[] { "genre:cozy" })),
+        };
+        var opt = new RecommenderOptions { K = 5, Mode = ScorerMode.NearestNeighbor, CategoryWeights = new Dictionary<string, double> { ["genre"] = 1.0 } };
+        var withNull = new ContentRecommender().Recommend(liked, cands, opt);
+        var withEmpty = new ContentRecommender().Recommend(liked, cands, opt, Array.Empty<ProfileItem>());
+        withNull.Recommendations.Single(r => r.ItemId == "c").Score
+            .Should().Be(withEmpty.Recommendations.Single(r => r.ItemId == "c").Score);
+        withNull.Recommendations.Single(r => r.ItemId == "c").PenalizedByItemIds.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void CandidateSimilarToDisliked_IsPenalized()
+    {
+        var liked = new[] { new ProfileItem("L1", FeatureVector.FromKeys(new[] { "genre:strategy" }), 5) };
+        var disliked = new[] { new ProfileItem("D1", FeatureVector.FromKeys(new[] { "genre:horror" }), 5) };
+        var cands = new[]
+        {
+            new CandidateItem("clean",   FeatureVector.FromKeys(new[] { "genre:strategy" })),
+            new CandidateItem("tainted", FeatureVector.FromKeys(new[] { "genre:strategy", "genre:horror" })),
+        };
+        var opt = new RecommenderOptions
+        {
+            K = 5, Mode = ScorerMode.NearestNeighbor, NegativeWeight = 1.0,
+            CategoryWeights = new Dictionary<string, double> { ["genre"] = 1.0 }
+        };
+        var res = new ContentRecommender().Recommend(liked, cands, opt, disliked);
+        var clean   = res.Recommendations.Single(r => r.ItemId == "clean");
+        var tainted = res.Recommendations.Single(r => r.ItemId == "tainted");
+        tainted.Score.Should().BeLessThan(clean.Score);
+        tainted.PenalizedByItemIds.Should().Contain("D1");
+    }
+
+    [Fact]
+    public void Penalty_ClampsScoreAtZero()
+    {
+        // A second candidate with a different feature keeps genre:x out of 100% of corpus docs,
+        // so its IDF stays positive and scores are computed (not collapsed to empty).
+        var liked    = new[] { new ProfileItem("L1", FeatureVector.FromKeys(new[] { "genre:x" }), 5) };
+        var disliked = new[] { new ProfileItem("D1", FeatureVector.FromKeys(new[] { "genre:x" }), 5) };
+        var cands    = new[]
+        {
+            new CandidateItem("c",    FeatureVector.FromKeys(new[] { "genre:x" })),
+            new CandidateItem("other", FeatureVector.FromKeys(new[] { "genre:y" })),
+        };
+        var opt = new RecommenderOptions { K = 5, NegativeWeight = 10.0, CategoryWeights = new Dictionary<string, double> { ["genre"] = 1.0 } };
+        var rec = new ContentRecommender().Recommend(liked, cands, opt, disliked).Recommendations.Single(r => r.ItemId == "c");
+        rec.Score.Should().Be(0);
+    }
 }

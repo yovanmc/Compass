@@ -12,6 +12,7 @@ public sealed class RecommenderOptions
     public double DefaultCategoryWeight { get; init; } = 1.0;
     public int MaxExplanationFeatures { get; init; } = 3;
     public int MaxExplanationNeighbors { get; init; } = 3;
+    public double NegativeWeight { get; init; } = 0.0;
 
     public double WeightFor(string category)
         => CategoryWeights.TryGetValue(category, out var w) ? w : DefaultCategoryWeight;

@@ -6,6 +6,7 @@ public sealed record Recommendation(
     string ItemId,
     double Score,
     IReadOnlyList<FeatureContribution> TopFeatures,
-    IReadOnlyList<string> NearestLikedItemIds);
+    IReadOnlyList<string> NearestLikedItemIds,
+    IReadOnlyList<string> PenalizedByItemIds);
 
 public sealed record RankedResult(IReadOnlyList<Recommendation> Recommendations);
