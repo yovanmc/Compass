@@ -318,6 +318,41 @@
                     </TextBlock>
                 </Button>
 
+                <!-- ── MORE LIKE THIS (only when HasSimilar) ──────────────── -->
+                <StackPanel Margin="0,14,0,0"
+                            Visibility="{Binding HasSimilar, Converter={StaticResource BoolToVis}}">
+                    <Border Height="1" Background="#222" Margin="0,0,0,14"/>
+                    <TextBlock Text="More like this"
+                               Foreground="#8A8A8A" FontSize="11" FontWeight="SemiBold"
+                               Margin="0,0,0,8"/>
+                    <ItemsControl ItemsSource="{Binding Similar, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate><WrapPanel Orientation="Horizontal"/></ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Width="120" Margin="0,0,8,8"
+                                        Background="#141414" BorderBrush="#2A2A2A" BorderThickness="1"
+                                        CornerRadius="6" Padding="8,7"
+                                        Cursor="Hand"
+                                        MouseLeftButtonUp="Similar_Click">
+                                    <StackPanel>
+                                        <!-- cover placeholder (thumbs deferred) -->
+                                        <Border Height="56" Background="#222" CornerRadius="4" Margin="0,0,0,6"/>
+                                        <TextBlock Text="{Binding Name, Mode=OneWay}"
+                                                   Foreground="#EAEAEA" FontSize="11"
+                                                   TextWrapping="Wrap" MaxHeight="30"
+                                                   TextTrimming="CharacterEllipsis"/>
+                                        <TextBlock Foreground="#4FC3F7" FontSize="10" Margin="0,3,0,0">
+                                            <Run Text="{Binding ScorePercent, Mode=OneWay}"/><Run Text="% match"/>
+                                        </TextBlock>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

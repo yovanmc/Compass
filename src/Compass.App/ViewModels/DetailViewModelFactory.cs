@@ -37,7 +37,14 @@ public sealed class DetailViewModelFactory
         var result = _recs.Recommend(library, _state.Current);
         var rec = result.Recommendations.FirstOrDefault(r => r.Game.SteamAppId == appId);
 
-        var vm = new DetailViewModel(game, rec, _covers, _store, onChangedAndClose);
+        var similar = _recs.SimilarTo(library, appId, 6)
+            .Select(r => new SimilarRow(
+                r.Game.SteamAppId,
+                r.Game.Name,
+                (int)Math.Round(Math.Clamp(r.Score, 0, 1) * 100)))
+            .ToList();
+
+        var vm = new DetailViewModel(game, rec, _covers, _store, onChangedAndClose, similar);
         return vm;
     }
 }

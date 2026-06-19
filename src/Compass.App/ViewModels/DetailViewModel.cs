@@ -14,6 +14,9 @@ public sealed record FeatureGroup(string Category, IReadOnlyList<string> Items);
 /// <summary>A "top factor" row: humanized feature name + bar fraction (0..1, relative to the strongest factor).</summary>
 public sealed record FeatureBar(string Name, double Fraction);
 
+/// <summary>A "more like this" entry: target appId + name + similarity percent.</summary>
+public sealed record SimilarRow(int AppId, string Name, int ScorePercent);
+
 /// <summary>ViewModel for the game detail slide-over panel.</summary>
 public sealed partial class DetailViewModel : ObservableObject
 {
@@ -93,6 +96,20 @@ public sealed partial class DetailViewModel : ObservableObject
     public IReadOnlyList<string> NearestLoved  => _rec?.WhyLikedNames       ?? [];
     public IReadOnlyList<string> PenalizedBy   => _rec?.WhyPenalizedNames   ?? [];
 
+    // ── More like this ────────────────────────────────────────────────────
+
+    public IReadOnlyList<SimilarRow> Similar { get; private set; } = [];
+    public bool HasSimilar => Similar.Count > 0;
+
+    /// <summary>Raised when the user clicks a "more like this" entry; the shell re-opens detail for that appId.</summary>
+    public event Action<int>? GameChosen;
+
+    [RelayCommand]
+    private void OpenSimilar(SimilarRow? row)
+    {
+        if (row is not null) GameChosen?.Invoke(row.AppId);
+    }
+
     // ── Not-interested toggle ─────────────────────────────────────────────
 
     [ObservableProperty]
@@ -112,7 +129,8 @@ public sealed partial class DetailViewModel : ObservableObject
         GameRecommendation? rec,
         ICoverProvider covers,
         ISyncStore store,
-        Action onChangedAndClose)
+        Action onChangedAndClose,
+        IReadOnlyList<SimilarRow>? similar = null)
     {
         _game = game;
         _rec = rec;
@@ -120,6 +138,7 @@ public sealed partial class DetailViewModel : ObservableObject
         _store = store;
         _onChangedAndClose = onChangedAndClose;
 
+        Similar = similar ?? [];
         IsNotInterested = game.NotInterested;
         FeatureGroups = BuildFeatureGroups(game.FeatureKeys);
 

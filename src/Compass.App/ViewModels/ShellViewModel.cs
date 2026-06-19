@@ -73,12 +73,14 @@ public sealed partial class ShellViewModel : ObservableObject
 
     private void OnGameChosen(int appId)
     {
-        ActiveDetail = _detailFactory.Create(appId, onChangedAndClose: () =>
+        var vm = _detailFactory.Create(appId, onChangedAndClose: () =>
         {
             Recommend.RefreshFromStore();
             Library.RefreshFromStore();
             ActiveDetail = null;
         });
+        vm.GameChosen += OnGameChosen;   // "more like this" re-opens detail for the next game
+        ActiveDetail = vm;
     }
 
     [RelayCommand]
