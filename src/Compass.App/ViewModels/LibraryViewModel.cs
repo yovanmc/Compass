@@ -2,7 +2,6 @@ using System.Collections.ObjectModel;
 using System.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Compass.Core.Config;
 using Compass.Core.Covers;
 using Compass.Core.Model;
 using Compass.Core.Sync;
@@ -14,7 +13,7 @@ public sealed partial class LibraryViewModel : ObservableObject
 {
     private readonly ISyncStore _store;
     private readonly RecommendationService _recs;
-    private readonly RecommenderConfig _cfg;
+    private readonly RecommenderConfigState _state;
     private readonly ICoverProvider _covers;
 
     private IReadOnlyList<Game> _library = [];
@@ -57,11 +56,11 @@ public sealed partial class LibraryViewModel : ObservableObject
     public ObservableCollection<FacetOption> Facets { get; } = new();
 
     // ── Constructor ────────────────────────────────────────────────────────
-    public LibraryViewModel(ISyncStore store, RecommendationService recs, CompassOptions opts, ICoverProvider covers)
+    public LibraryViewModel(ISyncStore store, RecommendationService recs, RecommenderConfigState state, ICoverProvider covers)
     {
         _store  = store;
         _recs   = recs;
-        _cfg    = opts.Recommender;
+        _state  = state;
         _covers = covers;
         RefreshFromStore();
     }
@@ -95,7 +94,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         _library = _store.LoadLibrary();
 
         // Compute scores for the whole library (backlog candidates get scored)
-        var result = _recs.Recommend(_library, _cfg);
+        var result = _recs.Recommend(_library, _state.Current);
         _scoreByAppId = result.Recommendations
             .ToDictionary(r => r.Game.SteamAppId, r => r.Score);
 
@@ -163,7 +162,7 @@ public sealed partial class LibraryViewModel : ObservableObject
             Status              = SelectedStatus,
             Facet               = SelectedFacet,
             Sort                = SelectedSort,
-            PlayedFloorMinutes  = _cfg.PlayedFloorMinutes,
+            PlayedFloorMinutes  = _state.Current.PlayedFloorMinutes,
         };
 
         var filtered = LibraryQuery.Apply(_library, filter, _scoreByAppId);
@@ -172,7 +171,7 @@ public sealed partial class LibraryViewModel : ObservableObject
         foreach (var g in filtered)
         {
             double score = _scoreByAppId.TryGetValue(g.SteamAppId, out var s) ? s : 0;
-            Rows.Add(GameRow.From(g, score, _cfg.PlayedFloorMinutes));
+            Rows.Add(GameRow.From(g, score, _state.Current.PlayedFloorMinutes));
         }
 
         // Cancel stale cover loads and start new ones for the current rows.

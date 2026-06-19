@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Compass.Core.Config;
 using Compass.Core.Sync;
 using Compass.Core.Taste;
 
@@ -11,7 +10,7 @@ public sealed partial class RecommendViewModel : ObservableObject
 {
     private readonly ISyncStore _store;
     private readonly RecommendationService _recs;
-    private readonly RecommenderConfig _cfg;
+    private readonly RecommenderConfigState _state;
 
     public ObservableCollection<RecommendationRow> Recommendations { get; } = new();
     public ObservableCollection<GameRow> Unmatched { get; } = new();
@@ -26,18 +25,18 @@ public sealed partial class RecommendViewModel : ObservableObject
     private void OpenDetail(RecommendationRow row)
         => GameChosen?.Invoke(row.AppId);
 
-    public RecommendViewModel(ISyncStore store, RecommendationService recs, CompassOptions opts)
+    public RecommendViewModel(ISyncStore store, RecommendationService recs, RecommenderConfigState state)
     {
         _store = store;
         _recs = recs;
-        _cfg = opts.Recommender;
+        _state = state;
         RefreshFromStore();
     }
 
     public void RefreshFromStore()
     {
         var library = _store.LoadLibrary();
-        var result = _recs.Recommend(library, _cfg);
+        var result = _recs.Recommend(library, _state.Current);
 
         Recommendations.Clear();
         foreach (var r in result.Recommendations.Take(50))

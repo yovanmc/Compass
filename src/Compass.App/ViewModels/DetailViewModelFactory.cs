@@ -1,4 +1,3 @@
-using Compass.Core.Config;
 using Compass.Core.Covers;
 using Compass.Core.Sync;
 using Compass.Core.Taste;
@@ -13,18 +12,18 @@ public sealed class DetailViewModelFactory
 {
     private readonly ISyncStore _store;
     private readonly RecommendationService _recs;
-    private readonly CompassOptions _opts;
+    private readonly RecommenderConfigState _state;
     private readonly ICoverProvider _covers;
 
     public DetailViewModelFactory(
         ISyncStore store,
         RecommendationService recs,
-        CompassOptions opts,
+        RecommenderConfigState state,
         ICoverProvider covers)
     {
         _store  = store;
         _recs   = recs;
-        _opts   = opts;
+        _state  = state;
         _covers = covers;
     }
 
@@ -35,7 +34,7 @@ public sealed class DetailViewModelFactory
             ?? throw new InvalidOperationException($"Game with appId {appId} not found in library.");
 
         // Run recommendation to find this game's score/breakdown, if it is a backlog candidate.
-        var result = _recs.Recommend(library, _opts.Recommender);
+        var result = _recs.Recommend(library, _state.Current);
         var rec = result.Recommendations.FirstOrDefault(r => r.Game.SteamAppId == appId);
 
         var vm = new DetailViewModel(game, rec, _covers, _store, onChangedAndClose);
