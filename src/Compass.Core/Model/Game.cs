@@ -10,6 +10,7 @@ public sealed class Game
     public MatchMethod MatchMethod { get; init; } = MatchMethod.None;
     public double MatchConfidence { get; init; }
     public IReadOnlyList<string> FeatureKeys { get; init; } = Array.Empty<string>();
+    public bool NotInterested { get; init; }
 }
 
 public enum MatchMethod { None, AppId, Name }

@@ -72,4 +72,14 @@ public class GameRepositoryTests : IDisposable
         _repo.SetMatch(10, 555, "appid", 1.0);
         _repo.GetUnmatchedAppIds().Should().BeEquivalentTo(new[] { 11 });
     }
+
+    [Fact]
+    public void SetNotInterested_RoundTripsInLibrary()
+    {
+        _repo.UpsertOwnedGames(new[] { (10, "Doom", 600, 0) });
+        _repo.SetNotInterested(10, true);
+        _repo.LoadLibrary().Single(g => g.SteamAppId == 10).NotInterested.Should().BeTrue();
+        _repo.SetNotInterested(10, false);
+        _repo.LoadLibrary().Single(g => g.SteamAppId == 10).NotInterested.Should().BeFalse();
+    }
 }
