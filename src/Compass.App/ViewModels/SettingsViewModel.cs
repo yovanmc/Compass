@@ -133,6 +133,12 @@ public sealed partial class SettingsViewModel : ObservableObject
                 return;
         }
 
+        // Replace, don't merge: clear first so the sample becomes the entire
+        // library — matches the confirm text and the "overwrite a non-empty
+        // library" design decision. The provider upserts (it never clears), so
+        // without this a real synced library would be merged with, not replaced.
+        // Clearing is a harmless no-op when the library is already empty.
+        _store.ClearLibrary();
         _store.LoadSampleData(SampleLibrary.Load());
         LibraryReplaced?.Invoke();
     }
