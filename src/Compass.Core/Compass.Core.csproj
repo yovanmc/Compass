@@ -4,6 +4,10 @@
     <ProjectReference Include="..\Compass.Recommender\Compass.Recommender.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="sample-library.json" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

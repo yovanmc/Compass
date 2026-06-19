@@ -1,0 +1,322 @@
+[
+  {
+    "appId": 289070,
+    "name": "Sid Meier's Civilization VI",
+    "playtimeForeverMin": 2400,
+    "playtime2WeeksMin": 120,
+    "igdbName": "Civilization VI",
+    "featureKeys": ["genre:strategy", "genre:turn-based-strategy", "keyword:4x", "mode:singleplayer", "mode:multiplayer", "theme:historical"]
+  },
+  {
+    "appId": 281990,
+    "name": "Stellaris",
+    "playtimeForeverMin": 3100,
+    "playtime2WeeksMin": 90,
+    "igdbName": "Stellaris",
+    "featureKeys": ["genre:strategy", "genre:grand-strategy", "keyword:4x", "theme:sci-fi", "mode:singleplayer", "keyword:space"]
+  },
+  {
+    "appId": 233630,
+    "name": "Europa Universalis IV",
+    "playtimeForeverMin": 5200,
+    "playtime2WeeksMin": 60,
+    "igdbName": "Europa Universalis IV",
+    "featureKeys": ["genre:strategy", "genre:grand-strategy", "theme:historical", "mode:singleplayer", "keyword:grand-strategy"]
+  },
+  {
+    "appId": 394360,
+    "name": "Hearts of Iron IV",
+    "playtimeForeverMin": 1800,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Hearts of Iron IV",
+    "featureKeys": ["genre:strategy", "genre:grand-strategy", "theme:historical", "mode:singleplayer", "mode:multiplayer", "keyword:grand-strategy"]
+  },
+  {
+    "appId": 107410,
+    "name": "Arma 3",
+    "playtimeForeverMin": 960,
+    "playtime2WeeksMin": 45,
+    "igdbName": "Arma 3",
+    "featureKeys": ["genre:action", "genre:simulation", "mode:multiplayer", "mode:singleplayer", "theme:military"]
+  },
+  {
+    "appId": 1145360,
+    "name": "Hades",
+    "playtimeForeverMin": 1440,
+    "playtime2WeeksMin": 200,
+    "igdbName": "Hades",
+    "featureKeys": ["genre:action", "genre:rpg", "keyword:roguelike", "mode:singleplayer", "theme:fantasy"]
+  },
+  {
+    "appId": 292030,
+    "name": "The Witcher 3: Wild Hunt",
+    "playtimeForeverMin": 3600,
+    "playtime2WeeksMin": 0,
+    "igdbName": "The Witcher 3: Wild Hunt",
+    "featureKeys": ["genre:rpg", "genre:action", "theme:fantasy", "mode:singleplayer", "keyword:open-world"]
+  },
+  {
+    "appId": 489830,
+    "name": "The Elder Scrolls V: Skyrim Special Edition",
+    "playtimeForeverMin": 2700,
+    "playtime2WeeksMin": 0,
+    "igdbName": "The Elder Scrolls V: Skyrim Special Edition",
+    "featureKeys": ["genre:rpg", "genre:action", "theme:fantasy", "mode:singleplayer", "keyword:open-world"]
+  },
+  {
+    "appId": 1097150,
+    "name": "Baldur's Gate 3",
+    "playtimeForeverMin": 2880,
+    "playtime2WeeksMin": 300,
+    "igdbName": "Baldur's Gate 3",
+    "featureKeys": ["genre:rpg", "genre:turn-based", "theme:fantasy", "mode:singleplayer", "mode:multiplayer", "keyword:tactics"]
+  },
+  {
+    "appId": 975370,
+    "name": "Dwarf Fortress",
+    "playtimeForeverMin": 720,
+    "playtime2WeeksMin": 60,
+    "igdbName": "Dwarf Fortress",
+    "featureKeys": ["genre:strategy", "genre:simulation", "keyword:roguelike", "theme:fantasy", "mode:singleplayer"]
+  },
+  {
+    "appId": 1158310,
+    "name": "Crusader Kings III",
+    "playtimeForeverMin": 2100,
+    "playtime2WeeksMin": 80,
+    "igdbName": "Crusader Kings III",
+    "featureKeys": ["genre:strategy", "genre:grand-strategy", "theme:historical", "mode:singleplayer", "keyword:grand-strategy", "keyword:rpg-elements"]
+  },
+  {
+    "appId": 1091500,
+    "name": "Cyberpunk 2077",
+    "playtimeForeverMin": 1920,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Cyberpunk 2077",
+    "featureKeys": ["genre:rpg", "genre:action", "theme:sci-fi", "mode:singleplayer", "keyword:open-world"]
+  },
+  {
+    "appId": 70300,
+    "name": "Cthulhu Saves the World",
+    "playtimeForeverMin": 600,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Cthulhu Saves the World",
+    "featureKeys": ["genre:rpg", "genre:turn-based", "keyword:tactics", "mode:singleplayer", "theme:fantasy"]
+  },
+  {
+    "appId": 863550,
+    "name": "Age of Wonders: Planetfall",
+    "playtimeForeverMin": 840,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Age of Wonders: Planetfall",
+    "featureKeys": ["genre:strategy", "genre:turn-based-strategy", "keyword:4x", "theme:sci-fi", "mode:singleplayer"]
+  },
+  {
+    "appId": 251570,
+    "name": "7 Days to Die",
+    "playtimeForeverMin": 480,
+    "playtime2WeeksMin": 0,
+    "igdbName": "7 Days to Die",
+    "featureKeys": ["genre:action", "genre:survival", "theme:survival", "mode:singleplayer", "mode:multiplayer", "keyword:crafting"]
+  },
+  {
+    "appId": 1643430,
+    "name": "Victoria 3",
+    "playtimeForeverMin": 1200,
+    "playtime2WeeksMin": 100,
+    "igdbName": "Victoria 3",
+    "featureKeys": ["genre:strategy", "genre:grand-strategy", "theme:historical", "mode:singleplayer", "keyword:grand-strategy"]
+  },
+  {
+    "appId": 1024840,
+    "name": "Anno 1800",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Anno 1800",
+    "featureKeys": ["genre:strategy", "genre:simulation", "theme:historical", "mode:singleplayer", "keyword:city-builder"]
+  },
+  {
+    "appId": 960090,
+    "name": "Humankind",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Humankind",
+    "featureKeys": ["genre:strategy", "genre:turn-based-strategy", "keyword:4x", "theme:historical", "mode:singleplayer"]
+  },
+  {
+    "appId": 105450,
+    "name": "Endless Space",
+    "playtimeForeverMin": 90,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Endless Space",
+    "featureKeys": ["genre:strategy", "genre:turn-based-strategy", "keyword:4x", "theme:sci-fi", "mode:singleplayer"]
+  },
+  {
+    "appId": 208500,
+    "name": "Endless Space 2",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Endless Space 2",
+    "featureKeys": ["genre:strategy", "genre:turn-based-strategy", "keyword:4x", "theme:sci-fi", "mode:singleplayer", "mode:multiplayer"]
+  },
+  {
+    "appId": 410900,
+    "name": "Divinity: Original Sin 2",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Divinity: Original Sin 2",
+    "featureKeys": ["genre:rpg", "genre:turn-based", "theme:fantasy", "mode:singleplayer", "mode:multiplayer", "keyword:tactics"]
+  },
+  {
+    "appId": 611500,
+    "name": "Pillars of Eternity II: Deadfire",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Pillars of Eternity II: Deadfire",
+    "featureKeys": ["genre:rpg", "theme:fantasy", "mode:singleplayer", "keyword:crpg"]
+  },
+  {
+    "appId": 601150,
+    "name": "Devil May Cry 5",
+    "playtimeForeverMin": 60,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Devil May Cry 5",
+    "featureKeys": ["genre:action", "mode:singleplayer", "keyword:hack-and-slash"]
+  },
+  {
+    "appId": 219150,
+    "name": "Spelunky",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Spelunky",
+    "featureKeys": ["genre:action", "keyword:roguelike", "mode:singleplayer", "keyword:platformer"]
+  },
+  {
+    "appId": 359550,
+    "name": "Tom Clancy's Rainbow Six Siege",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Tom Clancy's Rainbow Six Siege",
+    "featureKeys": ["genre:action", "genre:shooter", "mode:multiplayer", "keyword:tactical-shooter"]
+  },
+  {
+    "appId": 1382330,
+    "name": "MONSTER HUNTER RISE",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Monster Hunter Rise",
+    "featureKeys": ["genre:action", "genre:rpg", "mode:singleplayer", "mode:multiplayer", "keyword:hunting"]
+  },
+  {
+    "appId": 1551360,
+    "name": "Forza Horizon 5",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Forza Horizon 5",
+    "featureKeys": ["genre:simulation", "genre:racing", "mode:singleplayer", "mode:multiplayer"]
+  },
+  {
+    "appId": 1238810,
+    "name": "Battle Brothers",
+    "playtimeForeverMin": 50,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Battle Brothers",
+    "featureKeys": ["genre:strategy", "genre:turn-based-strategy", "keyword:tactics", "theme:fantasy", "mode:singleplayer"]
+  },
+  {
+    "appId": 447820,
+    "name": "Pathfinder: Kingmaker",
+    "playtimeForeverMin": 30,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Pathfinder: Kingmaker",
+    "featureKeys": ["genre:rpg", "genre:strategy", "theme:fantasy", "mode:singleplayer", "keyword:crpg"]
+  },
+  {
+    "appId": 1942280,
+    "name": "Hogwarts Legacy",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Hogwarts Legacy",
+    "featureKeys": ["genre:rpg", "genre:action", "theme:fantasy", "mode:singleplayer", "keyword:open-world"]
+  },
+  {
+    "appId": 1237970,
+    "name": "Titanfall 2",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Titanfall 2",
+    "featureKeys": ["genre:action", "genre:shooter", "mode:singleplayer", "mode:multiplayer"]
+  },
+  {
+    "appId": 245620,
+    "name": "Tropico 5",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Tropico 5",
+    "featureKeys": ["genre:strategy", "genre:simulation", "keyword:city-builder", "mode:singleplayer"]
+  },
+  {
+    "appId": 1817070,
+    "name": "Starfield",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Starfield",
+    "featureKeys": ["genre:rpg", "genre:action", "theme:sci-fi", "mode:singleplayer", "keyword:open-world"]
+  },
+  {
+    "appId": 960170,
+    "name": "Age of Wonders 4",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Age of Wonders 4",
+    "featureKeys": ["genre:strategy", "genre:turn-based-strategy", "keyword:4x", "theme:fantasy", "mode:singleplayer", "mode:multiplayer"]
+  },
+  {
+    "appId": 1259420,
+    "name": "Wasteland 3",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Wasteland 3",
+    "featureKeys": ["genre:rpg", "genre:turn-based", "theme:post-apocalyptic", "mode:singleplayer", "keyword:tactics"]
+  },
+  {
+    "appId": 1172380,
+    "name": "My Time At Portia",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "My Time At Portia",
+    "featureKeys": ["genre:simulation", "genre:rpg", "keyword:crafting", "mode:singleplayer", "keyword:life-sim"]
+  },
+  {
+    "appId": 108600,
+    "name": "Project Zomboid",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": "Project Zomboid",
+    "featureKeys": ["genre:survival", "genre:simulation", "theme:survival", "keyword:crafting", "mode:singleplayer", "mode:multiplayer"]
+  },
+  {
+    "appId": 999999991,
+    "name": "Unpublished Indie Game Alpha",
+    "playtimeForeverMin": 5,
+    "playtime2WeeksMin": 0,
+    "igdbName": null,
+    "featureKeys": []
+  },
+  {
+    "appId": 999999992,
+    "name": "Mystery Bundle Item",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": null,
+    "featureKeys": []
+  },
+  {
+    "appId": 999999993,
+    "name": "Unknown Legacy Title",
+    "playtimeForeverMin": 0,
+    "playtime2WeeksMin": 0,
+    "igdbName": null,
+    "featureKeys": []
+  }
+]
