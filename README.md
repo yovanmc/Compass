@@ -18,7 +18,7 @@ vectors and affinities — so it can be reused across other projects.
 
 ## Status
 
-v3 (recommender depth & evaluation) is in `main`. It builds on the v2 browse/inspect/tune
+v4 (insights & relevance feedback) is in `main`. It builds on the v2 browse/inspect/tune
 app — a `NavigationView` shell with **Recommend**, **Library** (search / status / genre·theme
 facet / sort, rows or poster grid), and **Settings** (live recommender tuning) pages, plus a
 right-side game **detail** slide-over with keyless Steam cover art — and deepens the engine:
@@ -35,6 +35,12 @@ right-side game **detail** slide-over with keyless Steam cover art — and deepe
 - **Detail insight** — the score breakdown now shows real per-feature **contribution bars**
   (width ∝ magnitude) and a **More like this** section listing the nearest games; clicking one
   re-opens detail for it.
+- **Insights page** — a dedicated page showing your **taste profile** (top genres/themes by
+  playtime, playtime distribution, library composition, and the games that most drive your
+  recommendations) and **recommender health** (recall@10, intra-list diversity, feature coverage,
+  and a live scorer comparison) — all computed keyless from the cache.
+- **Relevance feedback** — **More like this / Less like this** on any game persistently nudges
+  your taste profile (a soft signal, distinct from Hide), tunable via a **Feedback weight** knob.
 
 Everything above runs entirely off the local SQLite cache. Live Steam/IGDB sync still needs your
 own API keys (see below). See the design docs in [`docs/superpowers/specs`](docs/superpowers/specs)
