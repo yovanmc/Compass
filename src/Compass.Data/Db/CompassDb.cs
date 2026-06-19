@@ -83,6 +83,24 @@ public sealed class CompassDb
                 alter.ExecuteNonQuery();
             }
         }
+
+        if (current < 3)
+        {
+            bool hasCol;
+            using (var chk = conn.CreateCommand())
+            {
+                chk.Transaction = tx;
+                chk.CommandText = "SELECT COUNT(*) FROM pragma_table_info('games') WHERE name='feedback'";
+                hasCol = Convert.ToInt32(chk.ExecuteScalar()) > 0;
+            }
+            if (!hasCol)
+            {
+                using var alter = conn.CreateCommand();
+                alter.Transaction = tx;
+                alter.CommandText = "ALTER TABLE games ADD COLUMN feedback INTEGER NOT NULL DEFAULT 0";
+                alter.ExecuteNonQuery();
+            }
+        }
     }
 
     public static string DefaultDbPath()

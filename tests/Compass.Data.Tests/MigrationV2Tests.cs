@@ -21,7 +21,7 @@ public class MigrationV2Tests
             var db = new CompassDb(p); db.Initialize();
             using var conn = db.OpenConnection();
             using var v = conn.CreateCommand(); v.CommandText = "PRAGMA user_version";
-            Convert.ToInt32(v.ExecuteScalar()).Should().Be(2);
+            Convert.ToInt32(v.ExecuteScalar()).Should().Be(3);
             using var c = conn.CreateCommand();
             c.CommandText = "SELECT COUNT(*) FROM pragma_table_info('games') WHERE name='not_interested'";
             Convert.ToInt32(c.ExecuteScalar()).Should().Be(1);
@@ -56,7 +56,7 @@ public class MigrationV2Tests
             var db = new CompassDb(p); db.Initialize(); // should migrate 1 -> 2
             using var c2 = db.OpenConnection();
             using var ver = c2.CreateCommand(); ver.CommandText = "PRAGMA user_version";
-            Convert.ToInt32(ver.ExecuteScalar()).Should().Be(2);
+            Convert.ToInt32(ver.ExecuteScalar()).Should().Be(3);
             using var col = c2.CreateCommand();
             col.CommandText = "SELECT not_interested FROM games WHERE steam_appid=10";
             Convert.ToInt32(col.ExecuteScalar()).Should().Be(0);   // defaulted
