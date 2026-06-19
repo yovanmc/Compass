@@ -1,6 +1,8 @@
 using System.Net.Http;
 using System.Windows;
 using System.Windows.Media;
+using Compass.App.Navigation;
+using Compass.App.Views;
 using Compass.Core.Config;
 using Compass.Core.Sync;
 using Compass.Core.Taste;
@@ -79,7 +81,17 @@ public partial class App : Application
             sp.GetRequiredService<ISyncStore>()));
 
         sc.AddSingleton(new RecommendationService());
-        sc.AddSingleton<ViewModels.MainViewModel>();
+        sc.AddSingleton<ViewModels.RecommendViewModel>();
+        sc.AddSingleton<ViewModels.ShellViewModel>();
+
+        // Pages — registered so PageProvider can resolve them from DI
+        sc.AddTransient<RecommendView>();
+        sc.AddTransient<LibraryView>();
+        sc.AddTransient<SettingsView>();
+
+        // Navigation page provider (feeds DI instances to WPF-UI NavigationView)
+        sc.AddSingleton<PageProvider>(sp => new PageProvider(sp));
+
         sc.AddSingleton<MainWindow>();
 
         _services = sc.BuildServiceProvider();
