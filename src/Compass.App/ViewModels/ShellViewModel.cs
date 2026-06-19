@@ -10,6 +10,7 @@ public sealed partial class ShellViewModel : ObservableObject
     private readonly SyncService _sync;
     private readonly CompassOptions _opts;
     private readonly DetailViewModelFactory _detailFactory;
+    private readonly InsightsViewModel _insights;
 
     public RecommendViewModel Recommend { get; }
     public LibraryViewModel Library { get; }
@@ -46,12 +47,14 @@ public sealed partial class ShellViewModel : ObservableObject
         RecommendViewModel recommend,
         LibraryViewModel library,
         SettingsViewModel settings,
+        InsightsViewModel insights,
         CompassOptions opts,
         DetailViewModelFactory detailFactory)
     {
         _sync          = sync;
         _opts          = opts;
         _detailFactory = detailFactory;
+        _insights      = insights;
         Recommend      = recommend;
         Library        = library;
         Settings       = settings;
@@ -61,18 +64,20 @@ public sealed partial class ShellViewModel : ObservableObject
         Recommend.GameChosen += OnGameChosen;
         Library.GameChosen   += OnGameChosen;
 
-        // Re-rank both pages whenever a Settings knob changes
+        // Re-rank both pages (and recompute Insights) whenever a Settings knob changes
         Settings.ConfigChanged += () =>
         {
             Recommend.RefreshFromStore();
             Library.RefreshFromStore();
+            _insights.RefreshFromStore();
         };
 
-        // Refresh both pages after Load sample data / Clear library
+        // Refresh both pages (and Insights) after Load sample data / Clear library
         Settings.LibraryReplaced += () =>
         {
             Recommend.RefreshFromStore();
             Library.RefreshFromStore();
+            _insights.RefreshFromStore();
         };
 
         // Seed the status line with initial counts if data is already in store
@@ -87,12 +92,14 @@ public sealed partial class ShellViewModel : ObservableObject
             {
                 Recommend.RefreshFromStore();
                 Library.RefreshFromStore();
+                _insights.RefreshFromStore();
                 ActiveDetail = null;
             },
             onLibraryChanged: () =>
             {
                 Recommend.RefreshFromStore();
                 Library.RefreshFromStore();
+                _insights.RefreshFromStore();
             });
         vm.GameChosen += OnGameChosen;   // "more like this" re-opens detail for the next game
         ActiveDetail = vm;
@@ -120,6 +127,7 @@ public sealed partial class ShellViewModel : ObservableObject
             // Refresh all page VMs after sync
             Recommend.RefreshFromStore();
             Library.RefreshFromStore();
+            _insights.RefreshFromStore();
         }
         catch (Exception ex)
         {

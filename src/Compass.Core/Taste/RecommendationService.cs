@@ -68,6 +68,8 @@ public sealed class RecommendationService
             {
                 var fw = cfg.FeedbackWeight * Math.Log(1 + cfg.PlayedFloorMinutes);
                 if (g.Feedback > 0) liked.Add(new ProfileItem(id, vec, fw));
+                // NOTE: the disliked signal only penalizes candidates when NegativeWeight > 0.
+                // With NegativeWeight = 0, "Less like this" is inert regardless of FeedbackWeight.
                 else                disliked.Add(new ProfileItem(id, vec, fw));
             }
 
