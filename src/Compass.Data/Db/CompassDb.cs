@@ -53,8 +53,37 @@ public sealed class CompassDb
         tx.Commit();
     }
 
-    // Future schema bumps add versioned steps here; v1 is the base schema only.
-    private static void RunMigrations(SqliteConnection conn, SqliteTransaction tx) { }
+    private static void RunMigrations(SqliteConnection conn, SqliteTransaction tx)
+    {
+        int current;
+        using (var get = conn.CreateCommand())
+        {
+            get.Transaction = tx;
+            get.CommandText = "PRAGMA user_version";
+            current = Convert.ToInt32(get.ExecuteScalar());
+        }
+
+        if (current < 2)
+        {
+            // v1 -> v2: additive.
+            // settings table is covered by Schema.Sql's IF NOT EXISTS (already run above).
+            // Add not_interested only if it's missing (a v1 games table won't have it).
+            bool hasCol;
+            using (var chk = conn.CreateCommand())
+            {
+                chk.Transaction = tx;
+                chk.CommandText = "SELECT COUNT(*) FROM pragma_table_info('games') WHERE name='not_interested'";
+                hasCol = Convert.ToInt32(chk.ExecuteScalar()) > 0;
+            }
+            if (!hasCol)
+            {
+                using var alter = conn.CreateCommand();
+                alter.Transaction = tx;
+                alter.CommandText = "ALTER TABLE games ADD COLUMN not_interested INTEGER NOT NULL DEFAULT 0";
+                alter.ExecuteNonQuery();
+            }
+        }
+    }
 
     public static string DefaultDbPath()
     {

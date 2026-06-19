@@ -2,7 +2,7 @@ namespace Compass.Data.Db;
 
 public static class Schema
 {
-    public const int Version = 1;
+    public const int Version = 2;
 
     public const string Sql = """
         CREATE TABLE IF NOT EXISTS games (
@@ -13,7 +13,8 @@ public static class Schema
             igdb_id               INTEGER NULL,
             match_method          TEXT NOT NULL DEFAULT 'none',
             match_confidence      REAL NOT NULL DEFAULT 0,
-            last_synced           TEXT NULL
+            last_synced           TEXT NULL,
+            not_interested        INTEGER NOT NULL DEFAULT 0
         );
         CREATE TABLE IF NOT EXISTS igdb_games (
             igdb_id   INTEGER PRIMARY KEY,
@@ -37,6 +38,10 @@ public static class Schema
             matched    INTEGER NOT NULL,
             unmatched  INTEGER NOT NULL,
             enriched   INTEGER NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS settings (
+            key    TEXT PRIMARY KEY,
+            value  TEXT NOT NULL
         );
         """;
 }
