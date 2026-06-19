@@ -148,6 +148,10 @@ sealed class InMemoryStore : ISyncStore
     public void SetNotInterested(int appId, bool value)
         => _notInterested[appId] = value;
 
+    private readonly Dictionary<int, int> _feedback = new();
+    public void SetFeedback(int appId, int value)
+        => _feedback[appId] = value;
+
     public void LoadSampleData(IReadOnlyList<SampleGame> games)
     {
         // Minimal in-memory implementation: upsert owned rows and record matches+features

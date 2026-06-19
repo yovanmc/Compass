@@ -110,6 +110,16 @@ public sealed class GameRepository
         cmd.ExecuteNonQuery();
     }
 
+    public void SetFeedback(int appId, int value)
+    {
+        using var conn = _db.OpenConnection();
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = "UPDATE games SET feedback=$v WHERE steam_appid=$id";
+        cmd.Parameters.AddWithValue("$v", value);
+        cmd.Parameters.AddWithValue("$id", appId);
+        cmd.ExecuteNonQuery();
+    }
+
     public IReadOnlyList<Game> LoadLibrary()
     {
         using var conn = _db.OpenConnection();
@@ -118,7 +128,8 @@ public sealed class GameRepository
             SELECT g.steam_appid, g.name, g.playtime_forever_min, g.playtime_2weeks_min,
                    g.igdb_id, g.match_method, g.match_confidence,
                    GROUP_CONCAT(gf.feature_key) AS feature_keys,
-                   g.not_interested
+                   g.not_interested,
+                   g.feedback
             FROM games g
             LEFT JOIN game_features gf ON gf.igdb_id = g.igdb_id
             GROUP BY g.steam_appid
@@ -140,6 +151,7 @@ public sealed class GameRepository
                 MatchConfidence = r.GetDouble(6),
                 FeatureKeys = keys,
                 NotInterested = r.GetInt32(8) != 0,
+                Feedback = r.GetInt32(9),
             });
         }
         return list;

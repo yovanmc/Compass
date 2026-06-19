@@ -12,6 +12,7 @@ public interface ISyncStore
     IReadOnlyList<Game> LoadLibrary();
     void AppendSyncLog(SyncReport report);
     void SetNotInterested(int appId, bool value);
+    void SetFeedback(int appId, int value);
 
     /// <summary>
     /// Loads the baked-in sample library into the store.

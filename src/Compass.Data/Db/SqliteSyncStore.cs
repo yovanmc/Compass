@@ -52,6 +52,9 @@ public sealed class SqliteSyncStore : ISyncStore
     public void SetNotInterested(int appId, bool value)
         => _games.SetNotInterested(appId, value);
 
+    public void SetFeedback(int appId, int value)
+        => _games.SetFeedback(appId, value);
+
     public void LoadSampleData(IReadOnlyList<SampleGame> games)
         => new SampleDataProvider(_db).Load(games);
 
