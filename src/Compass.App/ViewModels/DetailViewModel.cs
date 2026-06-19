@@ -33,7 +33,7 @@ public sealed partial class SimilarRow : ObservableObject
 }
 
 /// <summary>ViewModel for the game detail slide-over panel.</summary>
-public sealed partial class DetailViewModel : ObservableObject
+public sealed partial class DetailViewModel : ObservableObject, IDisposable
 {
     private readonly Game _game;
     private readonly GameRecommendation? _rec;
@@ -212,6 +212,14 @@ public sealed partial class DetailViewModel : ObservableObject
     private async Task LoadSimilarCoverAsync(SimilarRow row, CancellationToken ct)
     {
         row.CoverPath = await _covers.GetCoverPathAsync(row.AppId, ct);
+    }
+
+    // ── Dispose ───────────────────────────────────────────────────────────
+
+    public void Dispose()
+    {
+        _coverCts.Cancel();
+        _coverCts.Dispose();
     }
 
     // ── Feature group builder ─────────────────────────────────────────────

@@ -31,9 +31,11 @@ public sealed partial class ShellViewModel : ObservableObject
 
     // Detach the replaced panel's re-open handler so its event lifecycle is
     // symmetric with the subscribe in OnGameChosen (no dangling subscriptions).
+    // Also dispose the CTS to cancel any in-flight cover loads.
     partial void OnActiveDetailChanging(DetailViewModel? oldValue, DetailViewModel? newValue)
     {
         if (oldValue is not null) oldValue.GameChosen -= OnGameChosen;
+        oldValue?.Dispose();
     }
 
     public IReadOnlyList<string> MissingSecrets { get; }
