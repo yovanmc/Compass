@@ -18,13 +18,27 @@ vectors and affinities — so it can be reused across other projects.
 
 ## Status
 
-v2 (browse, inspect, tune) is in `main`. The app runs entirely off the local SQLite
-cache: a `NavigationView` shell with **Recommend**, **Library** (search / status / genre·theme
+v3 (recommender depth & evaluation) is in `main`. It builds on the v2 browse/inspect/tune
+app — a `NavigationView` shell with **Recommend**, **Library** (search / status / genre·theme
 facet / sort, rows or poster grid), and **Settings** (live recommender tuning) pages, plus a
-right-side game **detail** slide-over with a score breakdown and keyless Steam cover art.
+right-side game **detail** slide-over with keyless Steam cover art — and deepens the engine:
 
-Live Steam/IGDB sync still needs your own API keys (see below); everything else works offline.
-See the design docs in [`docs/superpowers/specs`](docs/superpowers/specs) for scope and architecture.
+- **MMR diversity re-ranking** — a live **Diversity** slider re-orders the top results for
+  variety instead of near-duplicates. It re-ranks order only (the shown match score stays the
+  relevance score); `Diversity = 0` reproduces the v2 ranking exactly.
+- **Evaluation harness** — a pure `RecommenderEvaluator` (leave-one-out recall@k, intra-list
+  diversity, feature coverage, score spread) with an xUnit quality-floor suite, so engine
+  quality is measurable and regression-guarded **without any API keys**.
+- **Baked-in sample library** — Settings → **Load sample data** populates the cache with a
+  ~40-game sample (real Steam appids) so the whole app is runnable and demoable keyless;
+  **Clear library** makes it reversible.
+- **Detail insight** — the score breakdown now shows real per-feature **contribution bars**
+  (width ∝ magnitude) and a **More like this** section listing the nearest games; clicking one
+  re-opens detail for it.
+
+Everything above runs entirely off the local SQLite cache. Live Steam/IGDB sync still needs your
+own API keys (see below). See the design docs in [`docs/superpowers/specs`](docs/superpowers/specs)
+for scope and architecture.
 
 ## Secrets / configuration
 
