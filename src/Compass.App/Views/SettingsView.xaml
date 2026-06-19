@@ -228,6 +228,45 @@
                 </Grid>
             </Border>
 
+            <!-- Feedback weight -->
+            <Border Background="#0F0F0F"
+                    BorderBrush="#222" BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="14,10"
+                    Margin="0,0,0,6">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Feedback weight"
+                                   Foreground="#EAEAEA"
+                                   FontSize="13"
+                                   Margin="0,0,0,2"/>
+                        <TextBlock Text="How strongly your 'more / less like this' feedback nudges recommendations (0 = ignore feedback)."
+                                   Foreground="#5F5F5F"
+                                   FontSize="11"
+                                   TextWrapping="Wrap"
+                                   Margin="0,0,0,8"/>
+                        <Slider Minimum="0" Maximum="2"
+                                Value="{Binding FeedbackWeight}"
+                                SmallChange="0.05"
+                                LargeChange="0.25"
+                                Foreground="#4FC3F7"/>
+                    </StackPanel>
+                    <TextBlock Grid.Column="1"
+                               Text="{Binding FeedbackWeight, Mode=OneWay, StringFormat={}{0:0.00}}"
+                               Foreground="#4FC3F7"
+                               FontSize="15"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"
+                               Margin="14,0,0,0"
+                               MinWidth="40"
+                               TextAlignment="Right"/>
+                </Grid>
+            </Border>
+
             <!-- ── Section: Category weights ─────────────────────────────── -->
             <TextBlock Text="CATEGORY WEIGHTS"
                        Foreground="#5F5F5F"

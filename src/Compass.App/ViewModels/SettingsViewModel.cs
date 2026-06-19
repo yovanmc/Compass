@@ -36,6 +36,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     private double diversity;
 
     [ObservableProperty]
+    private double feedbackWeight;
+
+    [ObservableProperty]
     private double weightGenre;
 
     [ObservableProperty]
@@ -94,6 +97,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     partial void OnKChanged(int value)                     => ApplyAndPersist();
     partial void OnHybridAlphaChanged(double value)        => ApplyAndPersist();
     partial void OnDiversityChanged(double value)          => ApplyAndPersist();
+    partial void OnFeedbackWeightChanged(double value)     => ApplyAndPersist();
     partial void OnWeightGenreChanged(double value)        => ApplyAndPersist();
     partial void OnWeightThemeChanged(double value)        => ApplyAndPersist();
     partial void OnWeightModeChanged(double value)         => ApplyAndPersist();
@@ -166,6 +170,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         SelectedScorerMode   = cfg.ScorerMode;
         HybridAlpha          = cfg.HybridAlpha;
         Diversity            = cfg.Diversity;
+        FeedbackWeight       = cfg.FeedbackWeight;
         NegativeWeight       = cfg.NegativeWeight;
         UseImplicitNegatives = cfg.UseImplicitNegatives;
         WeightGenre    = cfg.CategoryWeights.TryGetValue("genre",   out var g) ? g : 1.0;
@@ -182,6 +187,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         ScorerMode           = SelectedScorerMode,
         HybridAlpha          = HybridAlpha,
         Diversity            = Diversity,
+        FeedbackWeight       = FeedbackWeight,
         NegativeWeight       = NegativeWeight,
         UseImplicitNegatives = UseImplicitNegatives,
         CategoryWeights      = new Dictionary<string, double>
