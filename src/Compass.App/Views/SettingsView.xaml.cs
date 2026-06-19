@@ -1,3 +1,4 @@
+using System.Windows;
 using System.Windows.Controls;
 using Compass.App.ViewModels;
 
@@ -9,5 +10,9 @@ public partial class SettingsView : Page
     {
         InitializeComponent();
         DataContext = vm;
+
+        vm.Confirm = msg =>
+            MessageBox.Show(msg, "Compass", MessageBoxButton.YesNo, MessageBoxImage.Warning)
+            == MessageBoxResult.Yes;
     }
 }
