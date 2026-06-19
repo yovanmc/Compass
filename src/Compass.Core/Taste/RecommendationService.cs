@@ -89,18 +89,71 @@ public sealed class RecommendationService
 
         var ranked = _recommender.Recommend(liked, candidates, options, disliked);
 
-        var recs = ranked.Recommendations.Select(r =>
-        {
-            var game = byId[r.ItemId];
-            var whyFeatures = r.TopFeatures.Select(f => new WhyFeature(Humanize(f.FeatureKey), f.Contribution)).ToList();
-            var whyNames = r.NearestLikedItemIds
-                .Where(byId.ContainsKey).Select(nid => byId[nid].Name).ToList();
-            var whyPenalized = r.PenalizedByItemIds
-                .Where(byId.ContainsKey).Select(nid => byId[nid].Name).ToList();
-            return new GameRecommendation(game, r.Score, whyFeatures, whyNames, whyPenalized);
-        }).ToList();
+        var recs = ranked.Recommendations
+            .Select(r => MapRecommendation(r, byId))
+            .ToList();
 
         return new RecommendationResult(recs, unscored);
+    }
+
+    /// <summary>
+    /// Returns up to <paramref name="k"/> games most similar to the seed game (by content features),
+    /// excluding the seed itself and any game marked NotInterested. Games without features are skipped.
+    /// Returns an empty list if the seed is not found or has no features.
+    /// </summary>
+    public IReadOnlyList<GameRecommendation> SimilarTo(IReadOnlyList<Game> library, int seedAppId, int k)
+    {
+        var seed = library.FirstOrDefault(g => g.SteamAppId == seedAppId);
+        if (seed is null) return [];
+
+        var seedVec = GameFeatureExtractor.ToVector(seed);
+        if (seedVec.IsEmpty) return [];
+
+        var byId = new Dictionary<string, Game>();
+        var liked = new List<ProfileItem>
+        {
+            new(seedAppId.ToString(), seedVec, 1.0)
+        };
+
+        var candidates = new List<CandidateItem>();
+        foreach (var g in library)
+        {
+            if (g.SteamAppId == seedAppId) continue;   // exclude seed
+            if (g.NotInterested) continue;              // exclude not-interested
+
+            var vec = GameFeatureExtractor.ToVector(g);
+            if (vec.IsEmpty) continue;                  // exclude no-feature games
+
+            var id = g.SteamAppId.ToString();
+            byId[id] = g;
+            candidates.Add(new CandidateItem(id, vec));
+        }
+
+        if (candidates.Count == 0) return [];
+
+        var options = new RecommenderOptions { K = k };  // Diversity = 0 (default) — pure similarity
+        var ranked = _recommender.Recommend(liked, candidates, options, null);
+
+        return ranked.Recommendations
+            .Where(r => r.Score > 0)
+            .Take(k)
+            .Select(r => MapRecommendation(r, byId))
+            .ToList();
+    }
+
+    // ── Private helpers ───────────────────────────────────────────────────────
+
+    private static GameRecommendation MapRecommendation(Recommendation r, Dictionary<string, Game> byId)
+    {
+        var game = byId[r.ItemId];
+        var whyFeatures = r.TopFeatures
+            .Select(f => new WhyFeature(Humanize(f.FeatureKey), f.Contribution))
+            .ToList();
+        var whyNames = r.NearestLikedItemIds
+            .Where(byId.ContainsKey).Select(nid => byId[nid].Name).ToList();
+        var whyPenalized = r.PenalizedByItemIds
+            .Where(byId.ContainsKey).Select(nid => byId[nid].Name).ToList();
+        return new GameRecommendation(game, r.Score, whyFeatures, whyNames, whyPenalized);
     }
 
     private static string Humanize(string featureKey)
