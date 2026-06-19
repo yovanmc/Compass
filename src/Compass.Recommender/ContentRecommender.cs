@@ -46,14 +46,16 @@ public sealed class ContentRecommender : IRecommender
                 centroidRaw[k] = centroidRaw.TryGetValue(k, out var p) ? p + aff * w : aff * w;
         var centroid = VectorMath.L2Normalize(centroidRaw);
 
-        var recs = new List<Recommendation>(candidates.Count);
+        // Build scored candidates; track the normalized vector alongside each for MMR.
+        var scored = new List<(Recommendation rec, Dictionary<string, double> normVec)>(candidates.Count);
         foreach (var c in candidates)
         {
             var cv = idf.WeightNormalized(c.Features);
             if (cv.Count == 0)
             {
-                recs.Add(new Recommendation(c.ItemId, 0,
-                    Array.Empty<FeatureContribution>(), Array.Empty<string>(), Array.Empty<string>()));
+                scored.Add((new Recommendation(c.ItemId, 0,
+                    Array.Empty<FeatureContribution>(), Array.Empty<string>(), Array.Empty<string>()),
+                    cv));
                 continue;
             }
 
@@ -88,11 +90,60 @@ public sealed class ContentRecommender : IRecommender
                 .Take(options.MaxExplanationFeatures)
                 .ToList();
 
-            recs.Add(new Recommendation(c.ItemId, finalScore, contributions, neighbors, penalizedBy));
+            scored.Add((new Recommendation(c.ItemId, finalScore, contributions, neighbors, penalizedBy), cv));
         }
 
-        recs.Sort((a, b) => b.Score.CompareTo(a.Score));
-        return new RankedResult(recs);
+        // Sort by descending relevance score (pure-relevance order).
+        scored.Sort((a, b) => b.rec.Score.CompareTo(a.rec.Score));
+
+        // MMR re-rank: if δ=0 skip entirely (exact back-compat).
+        if (options.Diversity <= 0)
+            return new RankedResult(scored.Select(s => s.rec).ToList());
+
+        // Greedy MMR: repeatedly pick argmax of (1−δ)·relevance(d) − δ·maxCosine(d, selected).
+        // Vectors are already L2-normalized, so dot product == cosine similarity.
+        double delta = options.Diversity;
+        var remaining = new List<(Recommendation rec, Dictionary<string, double> normVec)>(scored);
+        var selected = new List<Recommendation>(remaining.Count);
+        // Track the normalized vectors of selected items separately for O(1) inner-loop access.
+        var selectedVecs = new List<Dictionary<string, double>>(remaining.Count);
+
+        while (remaining.Count > 0)
+        {
+            if (selected.Count == 0)
+            {
+                // First pick is always the highest-relevance item (already at index 0).
+                selected.Add(remaining[0].rec);
+                selectedVecs.Add(remaining[0].normVec);
+                remaining.RemoveAt(0);
+                continue;
+            }
+
+            int bestIdx = 0;
+            double bestMmr = double.NegativeInfinity;
+            for (int i = 0; i < remaining.Count; i++)
+            {
+                var (rec, normVec) = remaining[i];
+                double maxSim = 0;
+                foreach (var selVec in selectedVecs)
+                {
+                    double sim = VectorMath.Dot(normVec, selVec);
+                    if (sim > maxSim) maxSim = sim;
+                }
+                double mmr = (1 - delta) * rec.Score - delta * maxSim;
+                if (mmr > bestMmr)
+                {
+                    bestMmr = mmr;
+                    bestIdx = i;
+                }
+            }
+
+            selected.Add(remaining[bestIdx].rec);
+            selectedVecs.Add(remaining[bestIdx].normVec);
+            remaining.RemoveAt(bestIdx);
+        }
+
+        return new RankedResult(selected);
     }
 
     // Affinity-weighted kNN similarity. Returns (score, neighborIds).
