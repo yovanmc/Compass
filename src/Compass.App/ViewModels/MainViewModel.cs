@@ -1,12 +1,29 @@
 // This file is kept for the shared row types used by XAML DataTemplates.
 // The logic previously in MainViewModel has been split into ShellViewModel + RecommendViewModel.
+using CommunityToolkit.Mvvm.ComponentModel;
 using Compass.Core.Model;
 using Compass.Core.Taste;
 
 namespace Compass.App.ViewModels;
 
-public sealed record RecommendationRow(string Name, int ScorePercent, string Why, string FeatureLine)
+/// <summary>A recommendation card in the Recommend page.</summary>
+public sealed partial class RecommendationRow : ObservableObject
 {
+    public int AppId { get; }
+    public string Name { get; }
+    public int ScorePercent { get; }
+    public string Why { get; }
+    public string FeatureLine { get; }
+
+    public RecommendationRow(int appId, string name, int scorePercent, string why, string featureLine)
+    {
+        AppId       = appId;
+        Name        = name;
+        ScorePercent = scorePercent;
+        Why         = why;
+        FeatureLine = featureLine;
+    }
+
     public static RecommendationRow From(GameRecommendation r)
     {
         var feats = string.Join(" · ", r.WhyFeatures);
@@ -17,6 +34,7 @@ public sealed record RecommendationRow(string Name, int ScorePercent, string Why
             ? $"{feats} — {likes}"
             : feats.Length > 0 ? feats : likes;
         return new RecommendationRow(
+            r.Game.SteamAppId,
             r.Game.Name,
             (int)Math.Round(Math.Clamp(r.Score, 0, 1) * 100),
             why,
@@ -25,14 +43,17 @@ public sealed record RecommendationRow(string Name, int ScorePercent, string Why
 }
 
 /// <summary>A row in the Library page (compact-row and poster-grid views).</summary>
-public sealed record GameRow(
-    int AppId,
-    string Name,
-    int PlaytimeForeverMinutes,
-    double Score,
-    string Status,
-    string? CoverPath)
+public sealed partial class GameRow : ObservableObject
 {
+    public int AppId { get; }
+    public string Name { get; }
+    public int PlaytimeForeverMinutes { get; }
+    public double Score { get; }
+    public string Status { get; }
+
+    [ObservableProperty]
+    private string? coverPath;
+
     /// <summary>0-100 integer for binding to ScoreRing.Percent.</summary>
     public int ScorePercent => (int)Math.Round(Math.Clamp(Score, 0, 1) * 100);
 
@@ -49,6 +70,16 @@ public sealed record GameRow(
         }
     }
 
+    public GameRow(int appId, string name, int playtimeForeverMinutes, double score, string status, string? coverPathValue = null)
+    {
+        AppId = appId;
+        Name = name;
+        PlaytimeForeverMinutes = playtimeForeverMinutes;
+        Score = score;
+        Status = status;
+        coverPath = coverPathValue;
+    }
+
     // ── Factories ──────────────────────────────────────────────────────────
 
     /// <summary>Full factory used by LibraryViewModel.</summary>
@@ -63,12 +94,12 @@ public sealed record GameRow(
                     : "Backlog";
 
         return new GameRow(
-            AppId: g.SteamAppId,
-            Name: g.Name,
-            PlaytimeForeverMinutes: g.PlaytimeForeverMinutes,
-            Score: score,
-            Status: status,
-            CoverPath: null);
+            appId: g.SteamAppId,
+            name: g.Name,
+            playtimeForeverMinutes: g.PlaytimeForeverMinutes,
+            score: score,
+            status: status,
+            coverPathValue: null);
     }
 
     /// <summary>

@@ -14,120 +14,169 @@
         ExtendsContentIntoTitleBar="True"
         d:DataContext="{d:DesignInstance vm:ShellViewModel}">
 
+    <!-- Root grid: the existing 2-row shell + the detail overlay as siblings -->
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>   <!-- Title bar (persistent top bar: Sync + status) -->
-            <RowDefinition Height="*"/>      <!-- NavigationView shell -->
-        </Grid.RowDefinitions>
 
-        <!-- ═══ TITLE BAR (persistent top bar across all pages) ═══════════ -->
-        <!-- NOTE: ui:TitleBar must be a sibling of NavigationView, NOT inside
-             ui:NavigationView.TitleBar — the LeftFluent NavigationView template
-             does not render its TitleBar property, so anything placed there is
-             silently invisible. The standalone TitleBar template renders
-             Header / TrailingContent + the window caption buttons. -->
-        <ui:TitleBar Grid.Row="0"
-                     Background="#0A0A0A"
-                     Foreground="#EAEAEA">
-            <ui:TitleBar.Header>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,0,0">
-                    <TextBlock Text="&#x2BC7;"
-                               Foreground="#4FC3F7"
-                               FontSize="18"
-                               VerticalAlignment="Center"
-                               Margin="0,0,8,0"/>
-                    <TextBlock Text="Compass"
-                               FontSize="16" FontWeight="SemiBold"
-                               Foreground="#EAEAEA"
-                               VerticalAlignment="Center"/>
-                </StackPanel>
-            </ui:TitleBar.Header>
-            <ui:TitleBar.TrailingContent>
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
-                    <ui:Button Content="⟳  Sync"
-                               Command="{Binding SyncCommand}"
-                               IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
-                               Appearance="Primary"
-                               Background="#4FC3F7"
-                               Foreground="#0A0A0A"
-                               Padding="14,6"
-                               FontWeight="SemiBold"
-                               FontSize="13"
-                               Margin="0,0,12,0"
-                               VerticalAlignment="Center"/>
-                    <TextBlock Text="{Binding StatusText, Mode=OneWay}"
-                               Foreground="#8A8A8A" FontSize="12"
-                               VerticalAlignment="Center" MaxWidth="320"
-                               TextTrimming="CharacterEllipsis"/>
-                </StackPanel>
-            </ui:TitleBar.TrailingContent>
-        </ui:TitleBar>
+        <!-- ═══ EXISTING SHELL (TitleBar + NavigationView — UNCHANGED) ══════ -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>   <!-- Title bar (persistent top bar: Sync + status) -->
+                <RowDefinition Height="*"/>      <!-- NavigationView shell -->
+            </Grid.RowDefinitions>
 
-        <!-- ═══ NAVIGATION SHELL ═════════════════════════════════════════ -->
-        <ui:NavigationView x:Name="NavView"
-                           Grid.Row="1"
-                           PaneDisplayMode="LeftFluent"
-                           IsPaneToggleVisible="False"
-                           IsBackButtonVisible="Collapsed"
-                           OpenPaneLength="200"
-                           CompactPaneLength="52"
-                           Background="#0A0A0A"
-                           Foreground="#EAEAEA">
-
-            <!-- ═══ NAV ITEMS ════════════════════════════════════════════ -->
-            <ui:NavigationView.MenuItems>
-                <ui:NavigationViewItem Content="Recommend"
-                                       TargetPageType="{x:Type views:RecommendView}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Sparkle20"/>
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-                <ui:NavigationViewItem Content="Library"
-                                       TargetPageType="{x:Type views:LibraryView}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Library20"/>
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-            </ui:NavigationView.MenuItems>
-
-            <!-- ═══ FOOTER NAV ITEM ══════════════════════════════════════ -->
-            <ui:NavigationView.FooterMenuItems>
-                <ui:NavigationViewItem Content="Settings"
-                                       TargetPageType="{x:Type views:SettingsView}">
-                    <ui:NavigationViewItem.Icon>
-                        <ui:SymbolIcon Symbol="Settings20"/>
-                    </ui:NavigationViewItem.Icon>
-                </ui:NavigationViewItem>
-            </ui:NavigationView.FooterMenuItems>
-
-            <!-- ═══ HEADER CONTENT (missing-keys banner, persistent) ═════ -->
-            <ui:NavigationView.Header>
-                <Border Margin="16,6,16,0"
-                        Padding="14,10"
-                        Background="#0D1A22"
-                        BorderBrush="#4FC3F7"
-                        BorderThickness="1"
-                        CornerRadius="6"
-                        Visibility="{Binding HasMissingSecrets, Converter={StaticResource BoolToVis}}">
-                    <StackPanel>
-                        <TextBlock Text="Add your Steam / IGDB API keys to sync — see README"
-                                   Foreground="#4FC3F7" FontSize="13" FontWeight="SemiBold"
-                                   Margin="0,0,0,4"/>
-                        <ItemsControl ItemsSource="{Binding MissingSecrets, Mode=OneWay}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock FontSize="11" Foreground="#8A8A8A">
-                                        <Run Text="• "/>
-                                        <Run Text="{Binding Mode=OneWay}"/>
-                                    </TextBlock>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+            <!-- ═══ TITLE BAR (persistent top bar across all pages) ═══════════ -->
+            <!-- NOTE: ui:TitleBar must be a sibling of NavigationView, NOT inside
+                 ui:NavigationView.TitleBar — the LeftFluent NavigationView template
+                 does not render its TitleBar property, so anything placed there is
+                 silently invisible. The standalone TitleBar template renders
+                 Header / TrailingContent + the window caption buttons. -->
+            <ui:TitleBar Grid.Row="0"
+                         Background="#0A0A0A"
+                         Foreground="#EAEAEA">
+                <ui:TitleBar.Header>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="4,0,0,0">
+                        <TextBlock Text="&#x2BC7;"
+                                   Foreground="#4FC3F7"
+                                   FontSize="18"
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"/>
+                        <TextBlock Text="Compass"
+                                   FontSize="16" FontWeight="SemiBold"
+                                   Foreground="#EAEAEA"
+                                   VerticalAlignment="Center"/>
                     </StackPanel>
-                </Border>
-            </ui:NavigationView.Header>
+                </ui:TitleBar.Header>
+                <ui:TitleBar.TrailingContent>
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <ui:Button Content="⟳  Sync"
+                                   Command="{Binding SyncCommand}"
+                                   IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                   Appearance="Primary"
+                                   Background="#4FC3F7"
+                                   Foreground="#0A0A0A"
+                                   Padding="14,6"
+                                   FontWeight="SemiBold"
+                                   FontSize="13"
+                                   Margin="0,0,12,0"
+                                   VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding StatusText, Mode=OneWay}"
+                                   Foreground="#8A8A8A" FontSize="12"
+                                   VerticalAlignment="Center" MaxWidth="320"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+                </ui:TitleBar.TrailingContent>
+            </ui:TitleBar>
 
-        </ui:NavigationView>
+            <!-- ═══ NAVIGATION SHELL ═════════════════════════════════════════ -->
+            <ui:NavigationView x:Name="NavView"
+                               Grid.Row="1"
+                               PaneDisplayMode="LeftFluent"
+                               IsPaneToggleVisible="False"
+                               IsBackButtonVisible="Collapsed"
+                               OpenPaneLength="200"
+                               CompactPaneLength="52"
+                               Background="#0A0A0A"
+                               Foreground="#EAEAEA">
+
+                <!-- ═══ NAV ITEMS ════════════════════════════════════════════ -->
+                <ui:NavigationView.MenuItems>
+                    <ui:NavigationViewItem Content="Recommend"
+                                           TargetPageType="{x:Type views:RecommendView}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Sparkle20"/>
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Content="Library"
+                                           TargetPageType="{x:Type views:LibraryView}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Library20"/>
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.MenuItems>
+
+                <!-- ═══ FOOTER NAV ITEM ══════════════════════════════════════ -->
+                <ui:NavigationView.FooterMenuItems>
+                    <ui:NavigationViewItem Content="Settings"
+                                           TargetPageType="{x:Type views:SettingsView}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="Settings20"/>
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
+                </ui:NavigationView.FooterMenuItems>
+
+                <!-- ═══ HEADER CONTENT (missing-keys banner, persistent) ═════ -->
+                <ui:NavigationView.Header>
+                    <Border Margin="16,6,16,0"
+                            Padding="14,10"
+                            Background="#0D1A22"
+                            BorderBrush="#4FC3F7"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Visibility="{Binding HasMissingSecrets, Converter={StaticResource BoolToVis}}">
+                        <StackPanel>
+                            <TextBlock Text="Add your Steam / IGDB API keys to sync — see README"
+                                       Foreground="#4FC3F7" FontSize="13" FontWeight="SemiBold"
+                                       Margin="0,0,0,4"/>
+                            <ItemsControl ItemsSource="{Binding MissingSecrets, Mode=OneWay}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock FontSize="11" Foreground="#8A8A8A">
+                                            <Run Text="• "/>
+                                            <Run Text="{Binding Mode=OneWay}"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </ui:NavigationView.Header>
+
+            </ui:NavigationView>
+        </Grid>
+
+        <!-- ═══ DETAIL OVERLAY (sits on top of everything when IsDetailOpen) ══ -->
+        <Grid Visibility="{Binding IsDetailOpen, Converter={StaticResource BoolToVis}}">
+
+            <!-- Scrim: semi-transparent backdrop; click closes the panel -->
+            <Rectangle Fill="#A6000000">
+                <Rectangle.InputBindings>
+                    <MouseBinding MouseAction="LeftClick" Command="{Binding CloseDetailCommand}"/>
+                </Rectangle.InputBindings>
+            </Rectangle>
+
+            <!-- Slide-over panel: right-anchored, 430px wide -->
+            <Border x:Name="DetailPanel"
+                    HorizontalAlignment="Right"
+                    Width="430"
+                    Background="#0F0F0F"
+                    BorderBrush="#242424"
+                    BorderThickness="1,0,0,0">
+                <Border.RenderTransform>
+                    <TranslateTransform x:Name="DetailPanelTranslate" X="0"/>
+                </Border.RenderTransform>
+                <Border.Triggers>
+                    <!-- Slide in from right when the overlay becomes visible -->
+                    <EventTrigger RoutedEvent="Border.Loaded">
+                        <BeginStoryboard>
+                            <Storyboard>
+                                <DoubleAnimation
+                                    Storyboard.TargetName="DetailPanelTranslate"
+                                    Storyboard.TargetProperty="X"
+                                    From="430" To="0"
+                                    Duration="0:0:0.2">
+                                    <DoubleAnimation.EasingFunction>
+                                        <CubicEase EasingMode="EaseOut"/>
+                                    </DoubleAnimation.EasingFunction>
+                                </DoubleAnimation>
+                            </Storyboard>
+                        </BeginStoryboard>
+                    </EventTrigger>
+                </Border.Triggers>
+                <views:DetailView DataContext="{Binding ActiveDetail}"/>
+            </Border>
+
+        </Grid>
+
     </Grid>
 
 </ui:FluentWindow>

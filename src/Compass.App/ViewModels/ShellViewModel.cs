@@ -9,6 +9,7 @@ public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly SyncService _sync;
     private readonly CompassOptions _opts;
+    private readonly DetailViewModelFactory _detailFactory;
 
     public RecommendViewModel Recommend { get; }
     public LibraryViewModel Library { get; }
@@ -19,21 +20,52 @@ public sealed partial class ShellViewModel : ObservableObject
     [ObservableProperty]
     private bool isBusy;
 
+    [ObservableProperty]
+    private DetailViewModel? activeDetail;
+
+    public bool IsDetailOpen => ActiveDetail is not null;
+
+    partial void OnActiveDetailChanged(DetailViewModel? value)
+        => OnPropertyChanged(nameof(IsDetailOpen));
+
     public IReadOnlyList<string> MissingSecrets { get; }
     public bool HasMissingSecrets => MissingSecrets.Count > 0;
 
-    public ShellViewModel(SyncService sync, RecommendViewModel recommend, LibraryViewModel library, CompassOptions opts)
+    public ShellViewModel(
+        SyncService sync,
+        RecommendViewModel recommend,
+        LibraryViewModel library,
+        CompassOptions opts,
+        DetailViewModelFactory detailFactory)
     {
-        _sync = sync;
-        _opts = opts;
-        Recommend = recommend;
-        Library = library;
+        _sync          = sync;
+        _opts          = opts;
+        _detailFactory = detailFactory;
+        Recommend      = recommend;
+        Library        = library;
         MissingSecrets = SecretsGuard.FindMissing(opts);
+
+        // Subscribe to game-chosen events from both pages
+        Recommend.GameChosen += OnGameChosen;
+        Library.GameChosen   += OnGameChosen;
 
         // Seed the status line with initial counts if data is already in store
         if (Recommend.Recommendations.Count > 0 || Recommend.Unmatched.Count > 0)
             StatusText = $"Backlog ({Recommend.Recommendations.Count}) · Unmatched ({Recommend.Unmatched.Count})";
     }
+
+    private void OnGameChosen(int appId)
+    {
+        ActiveDetail = _detailFactory.Create(appId, onChangedAndClose: () =>
+        {
+            Recommend.RefreshFromStore();
+            Library.RefreshFromStore();
+            ActiveDetail = null;
+        });
+    }
+
+    [RelayCommand]
+    private void CloseDetail() => ActiveDetail = null;
 
     [RelayCommand]
     private async Task SyncAsync()

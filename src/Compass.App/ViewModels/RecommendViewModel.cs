@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Compass.Core.Config;
 using Compass.Core.Sync;
 using Compass.Core.Taste;
@@ -17,6 +18,13 @@ public sealed partial class RecommendViewModel : ObservableObject
 
     [ObservableProperty]
     private bool isEmpty = true;
+
+    /// <summary>Raised when a recommendation card is clicked. Carries the SteamAppId.</summary>
+    public event Action<int>? GameChosen;
+
+    [RelayCommand]
+    private void OpenDetail(RecommendationRow row)
+        => GameChosen?.Invoke(row.AppId);
 
     public RecommendViewModel(ISyncStore store, RecommendationService recs, CompassOptions opts)
     {

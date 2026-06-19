@@ -317,13 +317,17 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <!-- Cover placeholder block (46×64) -->
+                            <!-- Cover (46×64): placeholder shown when CoverPath null, image shown when non-null -->
                             <Border Grid.Column="0"
                                     Width="46" Height="64"
                                     Background="#222"
                                     CornerRadius="3"
                                     Margin="0,0,10,0"
-                                    VerticalAlignment="Center"/>
+                                    VerticalAlignment="Center">
+                                <Image Stretch="UniformToFill"
+                                       Visibility="{Binding CoverPath, Converter={StaticResource NullToVis}}"
+                                       Source="{Binding CoverPath, Converter={StaticResource PathToImageConverter}}"/>
+                            </Border>
 
                             <!-- Name + feature tags -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -454,14 +458,19 @@
                                     Cursor="Hand">
                                 <Border.InputBindings>
                                     <MouseBinding MouseAction="LeftClick"
-                                                  Command="{x:Null}"/>
+                                                  Command="{Binding DataContext.OpenDetailCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                                                  CommandParameter="{Binding}"/>
                                 </Border.InputBindings>
                                 <StackPanel>
-                                    <!-- Cover placeholder -->
+                                    <!-- Cover (190×100): placeholder shown when CoverPath null, image when non-null -->
                                     <Border Width="190" Height="100"
                                             Background="#222"
                                             CornerRadius="4"
-                                            Margin="0,0,0,8"/>
+                                            Margin="0,0,0,8">
+                                        <Image Stretch="UniformToFill"
+                                               Visibility="{Binding CoverPath, Converter={StaticResource NullToVis}}"
+                                               Source="{Binding CoverPath, Converter={StaticResource PathToImageConverter}}"/>
+                                    </Border>
 
                                     <!-- Name + score row -->
                                     <Grid>

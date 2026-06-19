@@ -11,6 +11,8 @@
             </ResourceDictionary.MergedDictionaries>
             <!-- Global converters available to all windows -->
             <local:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <local:PathToImageConverter x:Key="PathToImageConverter"/>
+            <local:NullToVisibilityConverter x:Key="NullToVis"/>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
         </ResourceDictionary>
     </Application.Resources>

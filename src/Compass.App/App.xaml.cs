@@ -2,10 +2,13 @@ using System.Net.Http;
 using System.Windows;
 using System.Windows.Media;
 using Compass.App.Navigation;
+using Compass.App.ViewModels;
 using Compass.App.Views;
 using Compass.Core.Config;
+using Compass.Core.Covers;
 using Compass.Core.Sync;
 using Compass.Core.Taste;
+using Compass.Data.Covers;
 using Compass.Data.Db;
 using Compass.Data.Igdb;
 using Compass.Data.Match;
@@ -81,9 +84,19 @@ public partial class App : Application
             sp.GetRequiredService<ISyncStore>()));
 
         sc.AddSingleton(new RecommendationService());
-        sc.AddSingleton<ViewModels.RecommendViewModel>();
-        sc.AddSingleton<ViewModels.LibraryViewModel>();
-        sc.AddSingleton<ViewModels.ShellViewModel>();
+
+        // Cover art infrastructure
+        sc.AddSingleton<ICoverDownloader>(sp =>
+            new HttpCoverDownloader(sp.GetRequiredService<IHttpClientFactory>().CreateClient()));
+        sc.AddSingleton<ICoverProvider>(sp =>
+            new SteamCoverProvider(
+                sp.GetRequiredService<ICoverDownloader>(),
+                SteamCoverProvider.DefaultCacheDir()));
+
+        sc.AddSingleton<RecommendViewModel>();
+        sc.AddSingleton<LibraryViewModel>();
+        sc.AddSingleton<DetailViewModelFactory>();
+        sc.AddSingleton<ShellViewModel>();
 
         // Pages — registered so PageProvider can resolve them from DI
         sc.AddTransient<RecommendView>();
