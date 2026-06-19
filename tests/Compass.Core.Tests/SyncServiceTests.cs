@@ -167,7 +167,7 @@ public class SyncServiceTests
             }
         };
 
-        var svc = new SyncService(steam, igdb, matcher, store, nameConfidenceThreshold: 0.85);
+        var svc = new SyncService(steam, igdb, matcher, store);
         var report = await svc.SyncAsync(default);
 
         report.Owned.Should().Be(2);

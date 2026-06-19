@@ -8,12 +8,9 @@ public sealed class SyncService
     private readonly IIgdbClient _igdb;
     private readonly IGameMatcher _matcher;
     private readonly ISyncStore _store;
-    private readonly double _threshold;
 
-    public SyncService(ISteamClient steam, IIgdbClient igdb, IGameMatcher matcher,
-        ISyncStore store, double nameConfidenceThreshold)
-        => (_steam, _igdb, _matcher, _store, _threshold) =
-           (steam, igdb, matcher, store, nameConfidenceThreshold);
+    public SyncService(ISteamClient steam, IIgdbClient igdb, IGameMatcher matcher, ISyncStore store)
+        => (_steam, _igdb, _matcher, _store) = (steam, igdb, matcher, store);
 
     public async Task<SyncReport> SyncAsync(CancellationToken ct, IProgress<string>? progress = null)
     {
