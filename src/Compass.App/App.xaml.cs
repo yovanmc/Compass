@@ -82,6 +82,7 @@ public partial class App : Application
 
         sc.AddSingleton(new RecommendationService());
         sc.AddSingleton<ViewModels.RecommendViewModel>();
+        sc.AddSingleton<ViewModels.LibraryViewModel>();
         sc.AddSingleton<ViewModels.ShellViewModel>();
 
         // Pages — registered so PageProvider can resolve them from DI

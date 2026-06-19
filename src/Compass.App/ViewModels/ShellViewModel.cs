@@ -11,6 +11,7 @@ public sealed partial class ShellViewModel : ObservableObject
     private readonly CompassOptions _opts;
 
     public RecommendViewModel Recommend { get; }
+    public LibraryViewModel Library { get; }
 
     [ObservableProperty]
     private string statusText = "Ready.";
@@ -21,11 +22,12 @@ public sealed partial class ShellViewModel : ObservableObject
     public IReadOnlyList<string> MissingSecrets { get; }
     public bool HasMissingSecrets => MissingSecrets.Count > 0;
 
-    public ShellViewModel(SyncService sync, RecommendViewModel recommend, CompassOptions opts)
+    public ShellViewModel(SyncService sync, RecommendViewModel recommend, LibraryViewModel library, CompassOptions opts)
     {
         _sync = sync;
         _opts = opts;
         Recommend = recommend;
+        Library = library;
         MissingSecrets = SecretsGuard.FindMissing(opts);
 
         // Seed the status line with initial counts if data is already in store
@@ -51,6 +53,7 @@ public sealed partial class ShellViewModel : ObservableObject
 
             // Refresh all page VMs after sync
             Recommend.RefreshFromStore();
+            Library.RefreshFromStore();
         }
         catch (Exception ex)
         {
