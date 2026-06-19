@@ -47,4 +47,22 @@ public class RecommendationServiceTests
         result.Recommendations.Select(r => r.Game.Name).Should().NotContain("No Metadata");
         result.UnscoredBacklog.Select(g => g.Name).Should().Contain("No Metadata");
     }
+
+    [Fact]
+    public void PlayedGame_WithNoFeatures_IsExcludedFromBothOutputs()
+    {
+        var library = new[]
+        {
+            // Normal played game that informs taste
+            Played(1, "Loved Strategy", 6000, "genre:strategy", "theme:sci-fi"),
+            // Played game above floor but with no features — must not appear in either output
+            Played(2, "Played No Features", 6000 /*, no features */),
+            // Backlog candidate with features so the recommender actually runs
+            Backlog(3, "Backlog Game", "genre:strategy"),
+        };
+        var result = new RecommendationService().Recommend(library, Cfg());
+
+        result.Recommendations.Select(r => r.Game.Name).Should().NotContain("Played No Features");
+        result.UnscoredBacklog.Select(g => g.Name).Should().NotContain("Played No Features");
+    }
 }
