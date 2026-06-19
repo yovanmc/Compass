@@ -18,8 +18,13 @@ vectors and affinities — so it can be reused across other projects.
 
 ## Status
 
-v1 in development. See [the design doc](docs/superpowers/specs/2026-06-19-compass-design.md)
-for scope and architecture.
+v2 (browse, inspect, tune) is in `main`. The app runs entirely off the local SQLite
+cache: a `NavigationView` shell with **Recommend**, **Library** (search / status / genre·theme
+facet / sort, rows or poster grid), and **Settings** (live recommender tuning) pages, plus a
+right-side game **detail** slide-over with a score breakdown and keyless Steam cover art.
+
+Live Steam/IGDB sync still needs your own API keys (see below); everything else works offline.
+See the design docs in [`docs/superpowers/specs`](docs/superpowers/specs) for scope and architecture.
 
 ## Secrets / configuration
 
