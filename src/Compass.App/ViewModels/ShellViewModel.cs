@@ -59,6 +59,13 @@ public sealed partial class ShellViewModel : ObservableObject
             Library.RefreshFromStore();
         };
 
+        // Refresh both pages after Load sample data / Clear library
+        Settings.LibraryReplaced += () =>
+        {
+            Recommend.RefreshFromStore();
+            Library.RefreshFromStore();
+        };
+
         // Seed the status line with initial counts if data is already in store
         if (Recommend.Recommendations.Count > 0 || Recommend.Unmatched.Count > 0)
             StatusText = $"Backlog ({Recommend.Recommendations.Count}) · Unmatched ({Recommend.Unmatched.Count})";

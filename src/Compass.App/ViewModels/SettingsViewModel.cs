@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Compass.Core.Config;
+using Compass.Core.Sync;
 
 namespace Compass.App.ViewModels;
 
@@ -9,6 +10,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     private readonly RecommenderSettingsService _settingsSvc;
     private readonly RecommenderConfigState _state;
     private readonly CompassOptions _opts;
+    private readonly ISyncStore _store;
 
     // Guard: prevents OnXxxChanged hooks from firing Save/re-rank during ctor population.
     private bool _loading = true;
@@ -31,6 +33,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     private double hybridAlpha;
 
     [ObservableProperty]
+    private double diversity;
+
+    [ObservableProperty]
     private double weightGenre;
 
     [ObservableProperty]
@@ -51,19 +56,31 @@ public sealed partial class SettingsViewModel : ObservableObject
     // Derived — raised explicitly in OnSelectedScorerModeChanged.
     public bool IsHybrid => SelectedScorerMode == "Hybrid";
 
-    // ── Event for shell re-rank ───────────────────────────────────────────
+    // ── Confirm delegate (wired by code-behind to MessageBox) ─────────────
+    /// <summary>
+    /// Called before any destructive data operation. Return true to proceed.
+    /// If null, the operation is aborted (fail-safe: no accidental data loss).
+    /// </summary>
+    public Func<string, bool>? Confirm { get; set; }
+
+    // ── Events ────────────────────────────────────────────────────────────
     /// <summary>Raised after every knob change and after Reset. Shell subscribes to re-rank Recommend + Library.</summary>
     public event Action? ConfigChanged;
+
+    /// <summary>Raised after LoadSampleData or ClearLibrary completes. Shell subscribes to refresh all pages.</summary>
+    public event Action? LibraryReplaced;
 
     // ── Constructor ───────────────────────────────────────────────────────
     public SettingsViewModel(
         RecommenderSettingsService settingsSvc,
         RecommenderConfigState state,
-        CompassOptions opts)
+        CompassOptions opts,
+        ISyncStore store)
     {
         _settingsSvc = settingsSvc;
         _state       = state;
         _opts        = opts;
+        _store       = store;
 
         // Load layered effective config (SQLite over appsettings defaults).
         var cfg = _settingsSvc.Load(opts.Recommender);
@@ -76,6 +93,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     partial void OnPlayedFloorMinutesChanged(int value)   => ApplyAndPersist();
     partial void OnKChanged(int value)                     => ApplyAndPersist();
     partial void OnHybridAlphaChanged(double value)        => ApplyAndPersist();
+    partial void OnDiversityChanged(double value)          => ApplyAndPersist();
     partial void OnWeightGenreChanged(double value)        => ApplyAndPersist();
     partial void OnWeightThemeChanged(double value)        => ApplyAndPersist();
     partial void OnWeightModeChanged(double value)         => ApplyAndPersist();
@@ -103,6 +121,37 @@ public sealed partial class SettingsViewModel : ObservableObject
         ConfigChanged?.Invoke();
     }
 
+    // ── Data commands ─────────────────────────────────────────────────────
+    [RelayCommand]
+    private void LoadSampleData()
+    {
+        bool hasData = _store.LoadLibrary().Count > 0;
+        if (hasData)
+        {
+            string msg = "This will replace your current library with the built-in sample data. Your settings will be kept. Proceed?";
+            if (!(Confirm?.Invoke(msg) ?? false))
+                return;
+        }
+
+        _store.LoadSampleData(SampleLibrary.Load());
+        LibraryReplaced?.Invoke();
+    }
+
+    [RelayCommand]
+    private void ClearLibrary()
+    {
+        bool hasData = _store.LoadLibrary().Count > 0;
+        if (!hasData)
+            return; // nothing to clear
+
+        string msg = "This will remove all library data (games, metadata, features). Your settings will be kept. Proceed?";
+        if (!(Confirm?.Invoke(msg) ?? false))
+            return;
+
+        _store.ClearLibrary();
+        LibraryReplaced?.Invoke();
+    }
+
     // ── Private helpers ───────────────────────────────────────────────────
     private void PopulateFromConfig(RecommenderConfig cfg)
     {
@@ -110,6 +159,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         K                    = cfg.K;
         SelectedScorerMode   = cfg.ScorerMode;
         HybridAlpha          = cfg.HybridAlpha;
+        Diversity            = cfg.Diversity;
         NegativeWeight       = cfg.NegativeWeight;
         UseImplicitNegatives = cfg.UseImplicitNegatives;
         WeightGenre    = cfg.CategoryWeights.TryGetValue("genre",   out var g) ? g : 1.0;
@@ -125,6 +175,7 @@ public sealed partial class SettingsViewModel : ObservableObject
         K                    = K,
         ScorerMode           = SelectedScorerMode,
         HybridAlpha          = HybridAlpha,
+        Diversity            = Diversity,
         NegativeWeight       = NegativeWeight,
         UseImplicitNegatives = UseImplicitNegatives,
         CategoryWeights      = new Dictionary<string, double>
