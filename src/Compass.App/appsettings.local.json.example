@@ -1,0 +1,5 @@
+{
+  "_comment": "This file shows the shape of local secret overrides only. The PREFERRED mechanism is dotnet user-secrets (see README — run `dotnet user-secrets set` from src/Compass.App). Copy this file's structure as a reference; do NOT rename it to appsettings.local.json and commit real values.",
+  "Steam": { "ApiKey": "your-steam-web-api-key" },
+  "Igdb": { "ClientId": "your-twitch-client-id", "ClientSecret": "your-twitch-client-secret" }
+}
