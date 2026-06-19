@@ -11,4 +11,5 @@ public interface ISyncStore
     void SaveMetadata(IReadOnlyList<IgdbGameMetadata> metadata);
     IReadOnlyList<Game> LoadLibrary();
     void AppendSyncLog(SyncReport report);
+    void SetNotInterested(int appId, bool value);
 }

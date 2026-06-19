@@ -46,4 +46,7 @@ public sealed class SqliteSyncStore : ISyncStore
     public IReadOnlyList<Game> LoadLibrary() => _games.LoadLibrary();
 
     public void AppendSyncLog(SyncReport report) => _log.Append(report);
+
+    public void SetNotInterested(int appId, bool value)
+        => _games.SetNotInterested(appId, value);
 }

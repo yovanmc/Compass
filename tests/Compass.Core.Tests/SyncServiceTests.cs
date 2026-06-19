@@ -64,6 +64,8 @@ sealed class InMemoryStore : ISyncStore
     // igdbId → list of feature keys
     private readonly Dictionary<long, List<string>> _features = new();
     private readonly List<SyncReport> _log = new();
+    // appId → notInterested flag
+    private readonly Dictionary<int, bool> _notInterested = new();
 
     public void UpsertOwned(IReadOnlyList<OwnedGame> games)
     {
@@ -142,6 +144,9 @@ sealed class InMemoryStore : ISyncStore
     }
 
     public void AppendSyncLog(SyncReport report) => _log.Add(report);
+
+    public void SetNotInterested(int appId, bool value)
+        => _notInterested[appId] = value;
 }
 
 // ── Tests ─────────────────────────────────────────────────────────────────
