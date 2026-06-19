@@ -47,6 +47,8 @@
                                Command="{Binding SyncCommand}"
                                IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
                                Appearance="Primary"
+                               Background="#4FC3F7"
+                               Foreground="#0A0A0A"
                                Padding="14,6"
                                FontWeight="SemiBold"
                                FontSize="13"

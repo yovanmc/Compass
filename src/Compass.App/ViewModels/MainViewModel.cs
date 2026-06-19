@@ -15,7 +15,6 @@ public sealed partial class MainViewModel : ObservableObject
     private readonly RecommenderConfig _cfg;
 
     public ObservableCollection<RecommendationRow> Recommendations { get; } = new();
-    public ObservableCollection<GameRow> Backlog { get; } = new();
     public ObservableCollection<GameRow> Unmatched { get; } = new();
 
     [ObservableProperty]

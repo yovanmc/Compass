@@ -44,14 +44,7 @@ public partial class ScoreRing : UserControl
         const double r = 22.5; // matches (50/2) - strokeThickness/2 = 25-2.5
 
         double angle = pct == 100 ? 359.999 : pct / 100.0 * 360.0;
-        double radians = (angle - 90) * Math.PI / 180.0; // start from top (12 o'clock)
 
-        double startX = cx + r * Math.Cos(-Math.PI / 2);  // top
-        double startY = cy + r * Math.Sin(-Math.PI / 2);  // top
-        double endX = cx + r * Math.Cos(radians - Math.PI / 2 + Math.PI / 2);
-        double endY = cy + r * Math.Sin(radians - Math.PI / 2 + Math.PI / 2);
-
-        // Recalculate cleanly
         double startAngleDeg = -90;
         double endAngleDeg = startAngleDeg + angle;
         double startRad = startAngleDeg * Math.PI / 180.0;
