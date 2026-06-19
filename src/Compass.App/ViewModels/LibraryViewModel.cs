@@ -23,6 +23,9 @@ public sealed partial class LibraryViewModel : ObservableObject
     // ── Displayed rows ─────────────────────────────────────────────────────
     public ObservableCollection<GameRow> Rows { get; } = new();
 
+    [ObservableProperty]
+    private bool isLibraryEmpty = true;
+
     // ── Filter / sort state ────────────────────────────────────────────────
     [ObservableProperty]
     private string searchText = string.Empty;
@@ -92,6 +95,7 @@ public sealed partial class LibraryViewModel : ObservableObject
     public void RefreshFromStore()
     {
         _library = _store.LoadLibrary();
+        IsLibraryEmpty = _library.Count == 0;
 
         // Compute scores for the whole library (backlog candidates get scored)
         var result = _recs.Recommend(_library, _state.Current);

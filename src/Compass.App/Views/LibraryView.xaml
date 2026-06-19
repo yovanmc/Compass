@@ -235,6 +235,15 @@
         <!-- ═══ CONTENT ══════════════════════════════════════════════════════ -->
         <Grid Grid.Row="1">
 
+            <!-- Empty-state onboarding overlay (no games in library at all) -->
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="380"
+                        Visibility="{Binding IsLibraryEmpty, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="No games yet" Foreground="#8A8A8A" FontSize="16" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                <TextBlock Text="Add your Steam / IGDB keys and hit Sync, or load the built-in sample library from Settings → Load sample data."
+                           Foreground="#5F5F5F" FontSize="13" TextWrapping="Wrap" TextAlignment="Center"/>
+            </StackPanel>
+
             <!-- Empty state (shown when Rows is empty) -->
             <TextBlock Text="No games match."
                        Foreground="#5F5F5F"

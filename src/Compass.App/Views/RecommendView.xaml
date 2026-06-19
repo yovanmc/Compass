@@ -23,14 +23,19 @@
         </Border>
 
         <!-- ═══ MAIN CONTENT ════════════════════════════════════════════ -->
+        <!-- Empty-state onboarding overlay (no games in library yet) -->
+        <StackPanel Grid.Row="1"
+                    VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="380"
+                    Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="No games yet" Foreground="#8A8A8A" FontSize="16" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" Margin="0,0,0,6"/>
+            <TextBlock Text="Add your Steam / IGDB keys and hit Sync, or load the built-in sample library from Settings → Load sample data."
+                       Foreground="#5F5F5F" FontSize="13" TextWrapping="Wrap" TextAlignment="Center"/>
+        </StackPanel>
+
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
                       Background="#0A0A0A" Padding="16,6,16,0">
             <StackPanel>
-
-                <!-- Empty state -->
-                <TextBlock Foreground="#5F5F5F" FontSize="13" Margin="0,4,0,16"
-                           Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}"
-                           Text="No recommendations yet — sync your library to get started."/>
 
                 <!-- Recommendations card grid -->
                 <ItemsControl ItemsSource="{Binding Recommendations, Mode=OneWay}">
