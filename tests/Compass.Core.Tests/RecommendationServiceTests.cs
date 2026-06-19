@@ -65,4 +65,39 @@ public class RecommendationServiceTests
         result.Recommendations.Select(r => r.Game.Name).Should().NotContain("Played No Features");
         result.UnscoredBacklog.Select(g => g.Name).Should().NotContain("Played No Features");
     }
+
+    [Fact]
+    public void NotInterestedGame_IsExcludedFromCandidates_AndPenalizesSimilar()
+    {
+        var cfg = Cfg(); cfg.NegativeWeight = 1.0;
+        var library = new[]
+        {
+            Played(1, "Loved Strategy", 6000, "genre:strategy"),
+            Backlog(2, "More Strategy", "genre:strategy"),
+            new Game { SteamAppId=3, Name="Hated Horror", PlaytimeForeverMinutes=0, FeatureKeys=new[]{"genre:horror"}, IgdbId=3, NotInterested=true },
+            Backlog(4, "Scary Strategy", "genre:strategy","genre:horror"),
+        };
+        var res = new RecommendationService().Recommend(library, cfg);
+        res.Recommendations.Select(r => r.Game.Name).Should().NotContain("Hated Horror");   // excluded as candidate
+        var more = res.Recommendations.Single(r => r.Game.Name=="More Strategy");
+        var scary = res.Recommendations.Single(r => r.Game.Name=="Scary Strategy");
+        scary.Score.Should().BeLessThan(more.Score);                                         // penalized
+    }
+
+    [Fact]
+    public void ImplicitNegatives_OnlyApplyWhenEnabled()
+    {
+        var library = new[]
+        {
+            Played(1, "Loved Strategy", 6000, "genre:strategy"),
+            // tried-and-dropped horror: 45 min (in [30, floor)) — implicit negative when enabled
+            new Game { SteamAppId=3, Name="Dropped Horror", PlaytimeForeverMinutes=45, FeatureKeys=new[]{"genre:horror"}, IgdbId=3 },
+            Backlog(4, "Scary Strategy", "genre:strategy","genre:horror"),
+        };
+        var off = Cfg(); off.NegativeWeight = 1.0; off.UseImplicitNegatives = false;
+        var on  = Cfg(); on.NegativeWeight = 1.0; on.UseImplicitNegatives = true;
+        var scoreOff = new RecommendationService().Recommend(library, off).Recommendations.Single(r=>r.Game.Name=="Scary Strategy").Score;
+        var scoreOn  = new RecommendationService().Recommend(library, on ).Recommendations.Single(r=>r.Game.Name=="Scary Strategy").Score;
+        scoreOn.Should().BeLessThan(scoreOff);   // implicit negative drags it down only when enabled
+    }
 }
