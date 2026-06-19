@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Compass.App/Compass.App.csproj" />
+    <Project Path="src/Compass.Core/Compass.Core.csproj" />
+    <Project Path="src/Compass.Data/Compass.Data.csproj" />
+    <Project Path="src/Compass.Recommender/Compass.Recommender.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Compass.Core.Tests/Compass.Core.Tests.csproj" />
+    <Project Path="tests/Compass.Data.Tests/Compass.Data.Tests.csproj" />
+    <Project Path="tests/Compass.Recommender.Tests/Compass.Recommender.Tests.csproj" />
+  </Folder>
+</Solution>
