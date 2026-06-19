@@ -31,7 +31,7 @@ public class RecommendationServiceTests
         var result = svc.Recommend(library, Cfg());
 
         result.Recommendations.First().Game.Name.Should().Be("More Strategy");
-        result.Recommendations.First().WhyFeatures.Should().Contain(s => s.Contains("strategy"));
+        result.Recommendations.First().WhyFeatures.Should().Contain(w => w.Name.Contains("strategy"));
         result.Recommendations.First().WhyLikedNames.Should().Contain("Loved Strategy");
     }
 

@@ -4,9 +4,12 @@ using Compass.Recommender;
 
 namespace Compass.Core.Taste;
 
+/// <summary>A single feature contributing to a recommendation, with its humanized name and engine magnitude.</summary>
+public sealed record WhyFeature(string Name, double Contribution);
+
 public sealed record GameRecommendation(
     Game Game, double Score,
-    IReadOnlyList<string> WhyFeatures,
+    IReadOnlyList<WhyFeature> WhyFeatures,
     IReadOnlyList<string> WhyLikedNames,
     IReadOnlyList<string> WhyPenalizedNames);
 
@@ -89,7 +92,7 @@ public sealed class RecommendationService
         var recs = ranked.Recommendations.Select(r =>
         {
             var game = byId[r.ItemId];
-            var whyFeatures = r.TopFeatures.Select(f => Humanize(f.FeatureKey)).ToList();
+            var whyFeatures = r.TopFeatures.Select(f => new WhyFeature(Humanize(f.FeatureKey), f.Contribution)).ToList();
             var whyNames = r.NearestLikedItemIds
                 .Where(byId.ContainsKey).Select(nid => byId[nid].Name).ToList();
             var whyPenalized = r.PenalizedByItemIds

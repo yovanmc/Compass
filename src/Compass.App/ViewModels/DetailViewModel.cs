@@ -76,9 +76,9 @@ public sealed partial class DetailViewModel : ObservableObject
 
     // ── Score breakdown (only when HasScore) ─────────────────────────────
 
-    // TODO: surface TopFeatures contributions for true bars
-    // WhyFeatures is already contribution-ordered; rendered as rank-ordered list.
-    public IReadOnlyList<string> TopFeatures   => _rec?.WhyFeatures         ?? [];
+    // TODO: surface TopFeatures contributions for true bars (Phase 6)
+    // WhyFeatures is contribution-ordered; expose names-only until bar UI is built.
+    public IReadOnlyList<string> TopFeatures   => _rec?.WhyFeatures.Select(w => w.Name).ToList() ?? [];
     public IReadOnlyList<string> NearestLoved  => _rec?.WhyLikedNames       ?? [];
     public IReadOnlyList<string> PenalizedBy   => _rec?.WhyPenalizedNames   ?? [];
 

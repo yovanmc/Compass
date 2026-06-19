@@ -26,7 +26,7 @@ public sealed partial class RecommendationRow : ObservableObject
 
     public static RecommendationRow From(GameRecommendation r)
     {
-        var feats = string.Join(" · ", r.WhyFeatures);
+        var feats = string.Join(" · ", r.WhyFeatures.Select(w => w.Name));
         var likes = r.WhyLikedNames.Count > 0
             ? $"like {string.Join(", ", r.WhyLikedNames)}"
             : "Similar to your taste";
