@@ -50,15 +50,25 @@ public sealed class RecommendationService
             byId[id] = g;
             var vec = GameFeatureExtractor.ToVector(g);
 
+            // Hide wins: exclude from candidates + contribute a negative signal; ignore any feedback.
             if (g.NotInterested)
             {
-                // Exclude from candidates entirely; build as disliked signal if it has features
                 if (!vec.IsEmpty)
                 {
                     var w = Math.Log(1 + Math.Max(g.PlaytimeForeverMinutes, cfg.PlayedFloorMinutes));
                     disliked.Add(new ProfileItem(id, vec, w));
                 }
                 continue;
+            }
+
+            // Explicit feedback: an extra taste signal. Strength = FeedbackWeight * log(1 + floor)
+            // (≈ "treat it like a game played right at the floor"). Does not change candidacy.
+            var hasFeedback = g.Feedback != 0;
+            if (!vec.IsEmpty && hasFeedback)
+            {
+                var fw = cfg.FeedbackWeight * Math.Log(1 + cfg.PlayedFloorMinutes);
+                if (g.Feedback > 0) liked.Add(new ProfileItem(id, vec, fw));
+                else                disliked.Add(new ProfileItem(id, vec, fw));
             }
 
             if (affinity.IsPlayed(g.PlaytimeForeverMinutes))
@@ -70,8 +80,10 @@ public sealed class RecommendationService
             }
             else // backlog candidate
             {
-                // Check for implicit negatives: tried-and-dropped games
-                if (cfg.UseImplicitNegatives
+                // Explicit feedback overrides implicit inference — a feedback'd game is never
+                // dropped as a tried-and-abandoned implicit negative; it stays a candidate.
+                if (!hasFeedback
+                    && cfg.UseImplicitNegatives
                     && g.PlaytimeForeverMinutes >= SampledThresholdMinutes
                     && g.PlaytimeForeverMinutes < cfg.PlayedFloorMinutes
                     && !vec.IsEmpty)
