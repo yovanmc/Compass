@@ -17,6 +17,10 @@ public sealed partial class InsightsViewModel : ObservableObject
     [ObservableProperty]
     private bool isEmpty;
 
+    public bool HasData => !IsEmpty;
+
+    partial void OnIsEmptyChanged(bool value) => OnPropertyChanged(nameof(HasData));
+
     [ObservableProperty]
     private TasteProfile? taste;
 

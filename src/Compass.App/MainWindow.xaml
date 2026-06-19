@@ -92,6 +92,12 @@
                             <ui:SymbolIcon Symbol="Library20"/>
                         </ui:NavigationViewItem.Icon>
                     </ui:NavigationViewItem>
+                    <ui:NavigationViewItem Content="Insights"
+                                           TargetPageType="{x:Type views:InsightsView}">
+                        <ui:NavigationViewItem.Icon>
+                            <ui:SymbolIcon Symbol="DataHistogram20"/>
+                        </ui:NavigationViewItem.Icon>
+                    </ui:NavigationViewItem>
                 </ui:NavigationView.MenuItems>
 
                 <!-- ═══ FOOTER NAV ITEM ══════════════════════════════════════ -->

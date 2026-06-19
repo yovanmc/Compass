@@ -1,0 +1,220 @@
+<Page x:Class="Compass.App.Views.InsightsView"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:vm="clr-namespace:Compass.App.ViewModels"
+      mc:Ignorable="d"
+      Background="#0A0A0A"
+      d:DataContext="{d:DesignInstance vm:InsightsViewModel}">
+    <Grid>
+        <!-- Empty state -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="380"
+                    Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}">
+            <TextBlock Text="No games yet" Foreground="#8A8A8A" FontSize="16" FontWeight="SemiBold"
+                       HorizontalAlignment="Center" Margin="0,0,0,6"/>
+            <TextBlock Text="Add your Steam / IGDB keys and hit Sync, or load the built-in sample library from Settings → Load sample data."
+                       Foreground="#5F5F5F" FontSize="13" TextWrapping="Wrap" TextAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Content -->
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,24,32,32"
+                      Visibility="{Binding HasData, Converter={StaticResource BoolToVis}}">
+            <StackPanel MaxWidth="720" HorizontalAlignment="Left">
+
+                <TextBlock Text="Insights" Foreground="#EAEAEA" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                <TextBlock Text="What your library says about your taste, and how the recommender is performing on it."
+                           Foreground="#5F5F5F" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,22"/>
+
+                <!-- ═══ YOUR TASTE ═══ -->
+                <TextBlock Text="Your taste" Foreground="#5F5F5F" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                <Grid Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,12,0">
+                        <TextBlock Text="Top genres" Foreground="#8A8A8A" FontSize="11" Margin="0,0,0,8"/>
+                        <ItemsControl ItemsSource="{Binding GenreBars, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="64"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Label}" Foreground="#EAEAEA" FontSize="11"
+                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+                                        <Border Grid.Column="1" Width="120" Height="8" Background="#1D1D1D" CornerRadius="4">
+                                            <Border Background="#4FC3F7" CornerRadius="4" HorizontalAlignment="Left"
+                                                    Width="{Binding Fraction, Converter={StaticResource FractionToWidth}, ConverterParameter=120}"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="{Binding Value}" Foreground="#5F5F5F" FontSize="10"
+                                                   VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Top themes" Foreground="#8A8A8A" FontSize="11" Margin="0,0,0,8"/>
+                        <ItemsControl ItemsSource="{Binding ThemeBars, Mode=OneWay}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,0,0,6">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="64"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="{Binding Label}" Foreground="#EAEAEA" FontSize="11"
+                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" Margin="0,0,8,0"/>
+                                        <Border Grid.Column="1" Width="120" Height="8" Background="#1D1D1D" CornerRadius="4">
+                                            <Border Background="#4FC3F7" CornerRadius="4" HorizontalAlignment="Left"
+                                                    Width="{Binding Fraction, Converter={StaticResource FractionToWidth}, ConverterParameter=120}"/>
+                                        </Border>
+                                        <TextBlock Grid.Column="2" Text="{Binding Value}" Foreground="#5F5F5F" FontSize="10"
+                                                   VerticalAlignment="Center" Margin="6,0,0,0"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Playtime distribution (vertical histogram) -->
+                <TextBlock Text="Playtime distribution" Foreground="#8A8A8A" FontSize="11" Margin="0,4,0,8"/>
+                <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="14,12" Margin="0,0,0,16">
+                    <ItemsControl ItemsSource="{Binding PlaytimeBars, Mode=OneWay}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Margin="4,0">
+                                    <Border Height="60">
+                                        <Border Background="#4FC3F7" VerticalAlignment="Bottom" CornerRadius="3,3,0,0"
+                                                Height="{Binding Fraction, Converter={StaticResource FractionToWidth}, ConverterParameter=60}"/>
+                                    </Border>
+                                    <TextBlock Text="{Binding Value}" Foreground="#8A8A8A" FontSize="10" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                    <TextBlock Text="{Binding Label}" Foreground="#5F5F5F" FontSize="10" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+                <!-- Composition -->
+                <TextBlock Text="Library composition" Foreground="#8A8A8A" FontSize="11" Margin="0,4,0,8"/>
+                <UniformGrid Rows="1" Margin="0,0,0,16">
+                    <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Taste.Composition.Played}" Foreground="#4CAF50" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Played" Foreground="#5F5F5F" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Taste.Composition.Backlog}" Foreground="#4FC3F7" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Backlog" Foreground="#5F5F5F" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Taste.Composition.Unmatched}" Foreground="#EBB740" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Unmatched" Foreground="#5F5F5F" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="10">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Taste.Composition.Hidden}" Foreground="#8A4A4A" FontSize="18" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Hidden" Foreground="#5F5F5F" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Most influential -->
+                <TextBlock Text="Most influential games" Foreground="#8A8A8A" FontSize="11" Margin="0,4,0,8"/>
+                <ItemsControl ItemsSource="{Binding Taste.MostInfluential, Mode=OneWay}" Margin="0,0,0,4">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Margin="0,0,0,4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Column="0" Text="{Binding Name}" Foreground="#EAEAEA" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Count}" Foreground="#4FC3F7" FontSize="12" Margin="10,0,0,0"/>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- ═══ DIVIDER ═══ -->
+                <Border Height="1" Background="#222" Margin="0,18,0,18"/>
+
+                <!-- ═══ RECOMMENDER HEALTH ═══ -->
+                <TextBlock Text="Recommender health" Foreground="#5F5F5F" FontSize="11" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+                <UniformGrid Rows="1" Margin="0,0,0,16">
+                    <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Health.RecallAt10, StringFormat={}{0:0.00}}" Foreground="#EBB740" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Recall@10" Foreground="#5F5F5F" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Health.IntraListDiversity, StringFormat={}{0:0.00}}" Foreground="#EBB740" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Diversity" Foreground="#5F5F5F" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="10" Margin="0,0,6,0">
+                        <StackPanel>
+                            <TextBlock Text="{Binding Health.DistinctFeatureCoverage}" Foreground="#EBB740" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Coverage" Foreground="#5F5F5F" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                    <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="10">
+                        <StackPanel>
+                            <TextBlock Foreground="#EBB740" FontSize="20" FontWeight="SemiBold" HorizontalAlignment="Center">
+                                <Run Text="{Binding Health.SpreadMin, StringFormat={}{0:0.00}, Mode=OneWay}"/><Run Text="–"/><Run Text="{Binding Health.SpreadMax, StringFormat={}{0:0.00}, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Text="Score spread" Foreground="#5F5F5F" FontSize="11" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </UniformGrid>
+
+                <!-- Scorer comparison -->
+                <TextBlock Text="Scorer comparison (recall@10 by mode and diversity δ)" Foreground="#8A8A8A" FontSize="11" Margin="0,4,0,8"/>
+                <Border Background="#0F0F0F" BorderBrush="#222" BorderThickness="1" CornerRadius="6" Padding="14,12">
+                    <ItemsControl ItemsSource="{Binding Health.Comparison, Mode=OneWay}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="150"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" FontSize="12" Foreground="#EAEAEA" TextTrimming="CharacterEllipsis">
+                                        <Run Text="{Binding Mode, Mode=OneWay}"/><Run Text=" · δ"/><Run Text="{Binding Delta, StringFormat={}{0:0.0}, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <Border Grid.Column="1" Width="200" Height="8" Background="#1D1D1D" CornerRadius="4" VerticalAlignment="Center">
+                                        <Border Background="#4FC3F7" CornerRadius="4" HorizontalAlignment="Left"
+                                                Width="{Binding RecallAt10, Converter={StaticResource FractionToWidth}, ConverterParameter=200}"/>
+                                    </Border>
+                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" Margin="8,0,0,0" FontSize="11" Foreground="#5F5F5F"
+                                               Text="{Binding RecallAt10, StringFormat={}{0:0.00}}"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -90,6 +90,7 @@ public partial class App : Application
             sp.GetRequiredService<ISyncStore>()));
 
         sc.AddSingleton(new RecommendationService());
+        sc.AddSingleton(new InsightsService());
 
         // Cover art infrastructure
         sc.AddSingleton<ICoverDownloader>(sp =>
@@ -103,12 +104,14 @@ public partial class App : Application
         sc.AddSingleton<LibraryViewModel>();
         sc.AddSingleton<DetailViewModelFactory>();
         sc.AddSingleton<SettingsViewModel>();
+        sc.AddSingleton<InsightsViewModel>();
         sc.AddSingleton<ShellViewModel>();
 
         // Pages — registered so PageProvider can resolve them from DI
         sc.AddTransient<RecommendView>();
         sc.AddTransient<LibraryView>();
         sc.AddTransient<SettingsView>();
+        sc.AddTransient<InsightsView>();
 
         // Navigation page provider (feeds DI instances to WPF-UI NavigationView)
         sc.AddSingleton<PageProvider>(sp => new PageProvider(sp));
