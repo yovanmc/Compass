@@ -10,4 +10,16 @@ public partial class RecommendView : Page
         InitializeComponent();
         DataContext = vm;
     }
+
+    // Bindings inside a MouseBinding can't resolve a VM command (InputBindings are
+    // outside the visual tree and don't inherit DataContext), so route card clicks here.
+    private void Card_Click(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (sender is System.Windows.FrameworkElement fe
+            && fe.DataContext is RecommendationRow row
+            && DataContext is RecommendViewModel vm)
+        {
+            vm.OpenDetailCommand.Execute(row);
+        }
+    }
 }

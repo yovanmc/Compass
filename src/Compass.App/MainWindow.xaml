@@ -138,11 +138,7 @@
         <Grid Visibility="{Binding IsDetailOpen, Converter={StaticResource BoolToVis}}">
 
             <!-- Scrim: semi-transparent backdrop; click closes the panel -->
-            <Rectangle Fill="#A6000000">
-                <Rectangle.InputBindings>
-                    <MouseBinding MouseAction="LeftClick" Command="{Binding CloseDetailCommand}"/>
-                </Rectangle.InputBindings>
-            </Rectangle>
+            <Rectangle Fill="#A6000000" MouseLeftButtonUp="Scrim_Click"/>
 
             <!-- Slide-over panel: right-anchored, 430px wide -->
             <Border x:Name="DetailPanel"

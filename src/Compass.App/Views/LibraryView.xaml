@@ -455,12 +455,8 @@
                                     BorderBrush="#242424" BorderThickness="1"
                                     CornerRadius="8"
                                     Padding="10,10,10,12"
-                                    Cursor="Hand">
-                                <Border.InputBindings>
-                                    <MouseBinding MouseAction="LeftClick"
-                                                  Command="{Binding DataContext.OpenDetailCommand, RelativeSource={RelativeSource AncestorType=Page}}"
-                                                  CommandParameter="{Binding}"/>
-                                </Border.InputBindings>
+                                    Cursor="Hand"
+                                    MouseLeftButtonUp="PosterCard_Click">
                                 <StackPanel>
                                     <!-- Cover (190×100): placeholder shown when CoverPath null, image when non-null -->
                                     <Border Width="190" Height="100"

@@ -75,7 +75,12 @@ public sealed partial class LibraryViewModel : ObservableObject
     partial void OnSelectedRowChanged(GameRow? value)
     {
         if (value is not null)
+        {
             GameChosen?.Invoke(value.AppId);
+            // Reset selection (deferred to avoid re-entrancy) so re-clicking the SAME
+            // row fires OnSelectedRowChanged again and reopens the detail panel.
+            System.Windows.Application.Current?.Dispatcher.BeginInvoke(() => SelectedRow = null);
+        }
     }
 
     /// <summary>Invoked by poster-view card clicks to open the detail panel.</summary>
