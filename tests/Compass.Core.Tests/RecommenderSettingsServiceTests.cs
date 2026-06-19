@@ -16,7 +16,7 @@ public class RecommenderSettingsServiceTests
     private static RecommenderConfig Defaults() => new()
     {
         PlayedFloorMinutes=120, RecencyWeight=0.25, K=5, ScorerMode="NearestNeighbor",
-        HybridAlpha=0.5, NegativeWeight=0.5, UseImplicitNegatives=false,
+        HybridAlpha=0.5, NegativeWeight=0.5, UseImplicitNegatives=false, Diversity=0.3,
         CategoryWeights = new(){ ["genre"]=1.0, ["theme"]=0.9, ["mode"]=0.6, ["keyword"]=0.5 }
     };
 
@@ -41,5 +41,16 @@ public class RecommenderSettingsServiceTests
         loaded.UseImplicitNegatives.Should().BeTrue();
         loaded.CategoryWeights["keyword"].Should().Be(0.2);
         loaded.CategoryWeights["genre"].Should().Be(1.0); // untouched default preserved
+    }
+
+    [Fact]
+    public void Save_ThenLoad_RoundTrips_Diversity()
+    {
+        var store = new FakeStore();
+        var svc = new RecommenderSettingsService(store);
+        var changed = Defaults(); changed.Diversity = 0.7;
+        svc.Save(changed);
+        var loaded = svc.Load(Defaults());
+        loaded.Diversity.Should().Be(0.7);
     }
 }

@@ -32,6 +32,7 @@ public sealed class RecommendationService
             CategoryWeights = cfg.CategoryWeights,
             NegativeWeight = cfg.NegativeWeight,
             HybridAlpha = cfg.HybridAlpha,
+            Diversity = cfg.Diversity,
         };
 
         var liked = new List<ProfileItem>();

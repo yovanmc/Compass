@@ -30,6 +30,7 @@ public sealed class RecommenderSettingsService
             HybridAlpha = D("HybridAlpha", defaults.HybridAlpha),
             NegativeWeight = D("NegativeWeight", defaults.NegativeWeight),
             UseImplicitNegatives = B("UseImplicitNegatives", defaults.UseImplicitNegatives),
+            Diversity = D("Diversity", defaults.Diversity),
             CategoryWeights = weights,
         };
     }
@@ -43,6 +44,7 @@ public sealed class RecommenderSettingsService
         _store.Set(P+"HybridAlpha", c.HybridAlpha.ToString(inv));
         _store.Set(P+"NegativeWeight", c.NegativeWeight.ToString(inv));
         _store.Set(P+"UseImplicitNegatives", c.UseImplicitNegatives.ToString());
+        _store.Set(P+"Diversity", c.Diversity.ToString(inv));
         foreach (var cat in new[]{"genre","theme","mode","keyword"})
             _store.Set(P+$"Weight:{cat}", (c.CategoryWeights.TryGetValue(cat, out var w) ? w : 1.0).ToString(inv));
     }
