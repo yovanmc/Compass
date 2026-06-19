@@ -82,7 +82,7 @@ public sealed class GameRepository
             fcmd.Transaction = tx;
             fcmd.CommandText = """
                 INSERT INTO features (feature_key, category, name) VALUES ($k, $cat, $n)
-                ON CONFLICT(feature_key) DO UPDATE SET name = excluded.name
+                ON CONFLICT(feature_key) DO UPDATE SET name = excluded.name, category = excluded.category
                 """;
             fcmd.Parameters.AddWithValue("$k", key);
             fcmd.Parameters.AddWithValue("$cat", category);
