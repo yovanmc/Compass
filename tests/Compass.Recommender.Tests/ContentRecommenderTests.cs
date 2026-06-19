@@ -84,4 +84,31 @@ public class ContentRecommenderTests
         rec.Score.Should().Be(0);
         rec.NearestLikedItemIds.Should().BeEmpty();
     }
+
+    [Fact]
+    public void EmptyCandidates_ReturnsNoRecommendations()
+    {
+        var liked = new[] { new ProfileItem("L1", FeatureVector.FromKeys(new[] { "genre:strategy" }), 5) };
+        var res = new ContentRecommender().Recommend(liked, Array.Empty<CandidateItem>(), Knn());
+        res.Recommendations.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AffinityZeroLiked_IsExcluded_NoRecommendations()
+    {
+        var liked = new[] { new ProfileItem("L1", FeatureVector.FromKeys(new[] { "genre:strategy" }), Affinity: 0) };
+        var candidates = new[] { new CandidateItem("c1", FeatureVector.FromKeys(new[] { "genre:strategy" })) };
+        var res = new ContentRecommender().Recommend(liked, candidates, Knn());
+        res.Recommendations.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AllLikedFeaturesUbiquitous_NormalizeToEmpty_NoRecommendations()
+    {
+        // genre:x appears in every corpus item (liked + candidates) → idf=0 → liked vector normalizes to empty → excluded
+        var liked = new[] { new ProfileItem("L1", FeatureVector.FromKeys(new[] { "genre:x" }), 5) };
+        var candidates = new[] { new CandidateItem("c", FeatureVector.FromKeys(new[] { "genre:x" })) };
+        var res = new ContentRecommender().Recommend(liked, candidates, Knn());
+        res.Recommendations.Should().BeEmpty();
+    }
 }
