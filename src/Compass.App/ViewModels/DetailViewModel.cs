@@ -25,6 +25,7 @@ public sealed partial class DetailViewModel : ObservableObject
     private readonly ICoverProvider _covers;
     private readonly ISyncStore _store;
     private readonly Action _onChangedAndClose;
+    private readonly Action _onLibraryChanged;
     private CancellationTokenSource _coverCts = new();
 
     // ── Bound properties ──────────────────────────────────────────────────
@@ -115,6 +116,38 @@ public sealed partial class DetailViewModel : ObservableObject
     [ObservableProperty]
     private bool isNotInterested;
 
+    // ── Feedback (more / less like this) ─────────────────────────────────
+
+    [ObservableProperty]
+    private int feedback;
+
+    public bool IsMoreLiked => Feedback > 0;
+    public bool IsLessLiked => Feedback < 0;
+
+    partial void OnFeedbackChanged(int value)
+    {
+        OnPropertyChanged(nameof(IsMoreLiked));
+        OnPropertyChanged(nameof(IsLessLiked));
+    }
+
+    [RelayCommand]
+    private void MoreLikeThis()
+    {
+        int next = Feedback > 0 ? 0 : 1;           // toggle on/off
+        _store.SetFeedback(_game.SteamAppId, next);
+        Feedback = next;
+        _onLibraryChanged();                        // re-rank pages; keep panel open
+    }
+
+    [RelayCommand]
+    private void LessLikeThis()
+    {
+        int next = Feedback < 0 ? 0 : -1;          // toggle on/off
+        _store.SetFeedback(_game.SteamAppId, next);
+        Feedback = next;
+        _onLibraryChanged();
+    }
+
     [RelayCommand]
     private void ToggleNotInterested()
     {
@@ -130,6 +163,7 @@ public sealed partial class DetailViewModel : ObservableObject
         ICoverProvider covers,
         ISyncStore store,
         Action onChangedAndClose,
+        Action onLibraryChanged,
         IReadOnlyList<SimilarRow>? similar = null)
     {
         _game = game;
@@ -137,9 +171,11 @@ public sealed partial class DetailViewModel : ObservableObject
         _covers = covers;
         _store = store;
         _onChangedAndClose = onChangedAndClose;
+        _onLibraryChanged = onLibraryChanged;
 
         Similar = similar ?? [];
         IsNotInterested = game.NotInterested;
+        Feedback = game.Feedback;
         FeatureGroups = BuildFeatureGroups(game.FeatureKeys);
 
         // Fire-and-forget cover load; cancel on dispose.

@@ -27,7 +27,7 @@ public sealed class DetailViewModelFactory
         _covers = covers;
     }
 
-    public DetailViewModel Create(int appId, Action onChangedAndClose)
+    public DetailViewModel Create(int appId, Action onChangedAndClose, Action onLibraryChanged)
     {
         var library = _store.LoadLibrary();
         var game = library.FirstOrDefault(g => g.SteamAppId == appId)
@@ -44,7 +44,7 @@ public sealed class DetailViewModelFactory
                 (int)Math.Round(Math.Clamp(r.Score, 0, 1) * 100)))
             .ToList();
 
-        var vm = new DetailViewModel(game, rec, _covers, _store, onChangedAndClose, similar);
+        var vm = new DetailViewModel(game, rec, _covers, _store, onChangedAndClose, onLibraryChanged, similar);
         return vm;
     }
 }
