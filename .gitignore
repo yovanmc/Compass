@@ -1,0 +1,45 @@
+# ---- Secrets: never commit (public repo) ----
+appsettings.local.json
+appsettings.*.local.json
+*.local.json
+.env
+.env.*
+!.env.example
+secrets.json
+
+# ---- .NET build output ----
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+
+# ---- Rider / VS Code ----
+.idea/
+.vscode/
+*.DotSettings.user
+
+# ---- Test / coverage ----
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+coverage*.json
+coverage*.xml
+coverage*.info
+*.coverage
+*.coveragexml
+
+# ---- Local app data / scratch ----
+*.db-shm
+*.db-wal
+/scratch/
+/artifacts/
+
+# ---- OS ----
+Thumbs.db
+desktop.ini
+.DS_Store
