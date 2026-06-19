@@ -53,4 +53,15 @@ public class RecommenderSettingsServiceTests
         var loaded = svc.Load(Defaults());
         loaded.Diversity.Should().Be(0.7);
     }
+
+    [Fact]
+    public void Save_ThenLoad_RoundTrips_FeedbackWeight()
+    {
+        var store = new FakeStore();
+        var svc = new RecommenderSettingsService(store);
+        var changed = Defaults(); changed.FeedbackWeight = 1.75;
+        svc.Save(changed);
+        var loaded = svc.Load(Defaults());
+        loaded.FeedbackWeight.Should().Be(1.75);
+    }
 }

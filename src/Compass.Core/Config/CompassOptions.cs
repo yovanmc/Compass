@@ -30,4 +30,5 @@ public sealed class RecommenderConfig
     public bool UseImplicitNegatives { get; set; } = false;
     public double HybridAlpha { get; set; } = 0.5;
     public double Diversity { get; set; } = 0.3;
+    public double FeedbackWeight { get; set; } = 1.0;
 }

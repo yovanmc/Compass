@@ -31,6 +31,7 @@ public sealed class RecommenderSettingsService
             NegativeWeight = D("NegativeWeight", defaults.NegativeWeight),
             UseImplicitNegatives = B("UseImplicitNegatives", defaults.UseImplicitNegatives),
             Diversity = D("Diversity", defaults.Diversity),
+            FeedbackWeight = D("FeedbackWeight", defaults.FeedbackWeight),
             CategoryWeights = weights,
         };
     }
@@ -45,6 +46,7 @@ public sealed class RecommenderSettingsService
         _store.Set(P+"NegativeWeight", c.NegativeWeight.ToString(inv));
         _store.Set(P+"UseImplicitNegatives", c.UseImplicitNegatives.ToString());
         _store.Set(P+"Diversity", c.Diversity.ToString(inv));
+        _store.Set(P+"FeedbackWeight", c.FeedbackWeight.ToString(inv));
         foreach (var cat in new[]{"genre","theme","mode","keyword"})
             _store.Set(P+$"Weight:{cat}", (c.CategoryWeights.TryGetValue(cat, out var w) ? w : 1.0).ToString(inv));
     }
