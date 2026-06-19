@@ -15,7 +15,22 @@ public sealed record FeatureGroup(string Category, IReadOnlyList<string> Items);
 public sealed record FeatureBar(string Name, double Fraction);
 
 /// <summary>A "more like this" entry: target appId + name + similarity percent.</summary>
-public sealed record SimilarRow(int AppId, string Name, int ScorePercent);
+public sealed partial class SimilarRow : ObservableObject
+{
+    public int AppId { get; }
+    public string Name { get; }
+    public int ScorePercent { get; }
+
+    [ObservableProperty]
+    private string? coverPath;
+
+    public SimilarRow(int appId, string name, int scorePercent)
+    {
+        AppId = appId;
+        Name = name;
+        ScorePercent = scorePercent;
+    }
+}
 
 /// <summary>ViewModel for the game detail slide-over panel.</summary>
 public sealed partial class DetailViewModel : ObservableObject
@@ -180,6 +195,9 @@ public sealed partial class DetailViewModel : ObservableObject
 
         // Fire-and-forget cover load; cancel on dispose.
         _ = LoadCoverAsync(_coverCts.Token);
+
+        foreach (var row in Similar)
+            _ = LoadSimilarCoverAsync(row, _coverCts.Token);
     }
 
     // ── Cover loading ─────────────────────────────────────────────────────
@@ -189,6 +207,11 @@ public sealed partial class DetailViewModel : ObservableObject
         // Do NOT ConfigureAwait(false) — must resume on UI thread so the property
         // set marshals correctly.
         CoverPath = await _covers.GetCoverPathAsync(_game.SteamAppId, ct);
+    }
+
+    private async Task LoadSimilarCoverAsync(SimilarRow row, CancellationToken ct)
+    {
+        row.CoverPath = await _covers.GetCoverPathAsync(row.AppId, ct);
     }
 
     // ── Feature group builder ─────────────────────────────────────────────

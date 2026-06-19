@@ -427,8 +427,19 @@
                                         Cursor="Hand"
                                         MouseLeftButtonUp="Similar_Click">
                                     <StackPanel>
-                                        <!-- cover placeholder (thumbs deferred) -->
-                                        <Border Height="56" Background="#222" CornerRadius="4" Margin="0,0,0,6"/>
+                                        <!-- cover thumb: #222 placeholder under image, image shown when CoverPath is non-null -->
+                                        <Border Height="56" Background="#222" CornerRadius="4" Margin="0,0,0,6">
+                                            <Grid>
+                                                <TextBlock Text="No cover"
+                                                           Foreground="#5F5F5F" FontSize="9"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           Visibility="{Binding CoverPath, Converter={StaticResource NullToVis}, ConverterParameter=invert}"/>
+                                                <Image Stretch="UniformToFill"
+                                                       Visibility="{Binding CoverPath, Converter={StaticResource NullToVis}}"
+                                                       Source="{Binding CoverPath, Converter={StaticResource PathToImageConverter}}"/>
+                                            </Grid>
+                                        </Border>
                                         <TextBlock Text="{Binding Name, Mode=OneWay}"
                                                    Foreground="#EAEAEA" FontSize="11"
                                                    TextWrapping="Wrap" MaxHeight="30"
