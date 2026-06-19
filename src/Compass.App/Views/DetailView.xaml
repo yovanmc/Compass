@@ -134,19 +134,31 @@
                     <TextBlock Text="Top factors"
                                Foreground="#8A8A8A" FontSize="11" FontWeight="SemiBold"
                                Margin="0,0,0,6"/>
-                    <!-- TopFeatures chips (rank-ordered by contribution) -->
+                    <!-- TopFeatures bars (rank-ordered by contribution, width ∝ magnitude) -->
                     <ItemsControl ItemsSource="{Binding TopFeatures, Mode=OneWay}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <WrapPanel Orientation="Horizontal"/>
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="#1E2840" CornerRadius="10" Padding="8,3" Margin="0,0,6,6">
-                                    <TextBlock Text="{Binding Mode=OneWay}"
-                                               Foreground="#4FC3F7" FontSize="11"/>
-                                </Border>
+                                <Grid Margin="0,0,0,5">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Feature name -->
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding Name, Mode=OneWay}"
+                                               Foreground="#4FC3F7" FontSize="11"
+                                               VerticalAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               Margin="0,0,10,0"/>
+                                    <!-- Bar track (fixed 180px) with cyan fill proportional to Fraction -->
+                                    <Border Grid.Column="1" Width="180" Height="6"
+                                            Background="#141414" CornerRadius="3"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center">
+                                        <Border Background="#4FC3F7" CornerRadius="3"
+                                                HorizontalAlignment="Left"
+                                                Width="{Binding Fraction, Converter={StaticResource FractionToWidth}, ConverterParameter=180}"/>
+                                    </Border>
+                                </Grid>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>

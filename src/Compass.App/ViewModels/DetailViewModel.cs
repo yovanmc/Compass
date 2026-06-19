@@ -11,6 +11,9 @@ namespace Compass.App.ViewModels;
 /// <summary>A grouping of feature items under a category label (e.g. Genres, Themes).</summary>
 public sealed record FeatureGroup(string Category, IReadOnlyList<string> Items);
 
+/// <summary>A "top factor" row: humanized feature name + bar fraction (0..1, relative to the strongest factor).</summary>
+public sealed record FeatureBar(string Name, double Fraction);
+
 /// <summary>ViewModel for the game detail slide-over panel.</summary>
 public sealed partial class DetailViewModel : ObservableObject
 {
@@ -76,9 +79,17 @@ public sealed partial class DetailViewModel : ObservableObject
 
     // ── Score breakdown (only when HasScore) ─────────────────────────────
 
-    // TODO: surface TopFeatures contributions for true bars (Phase 6)
-    // WhyFeatures is contribution-ordered; expose names-only until bar UI is built.
-    public IReadOnlyList<string> TopFeatures   => _rec?.WhyFeatures.Select(w => w.Name).ToList() ?? [];
+    public IReadOnlyList<FeatureBar> TopFeatures
+    {
+        get
+        {
+            if (_rec is null || _rec.WhyFeatures.Count == 0) return [];
+            double max = _rec.WhyFeatures.Max(w => w.Contribution);
+            return _rec.WhyFeatures
+                .Select(w => new FeatureBar(w.Name, max > 0 ? Math.Clamp(w.Contribution / max, 0, 1) : 0.0))
+                .ToList();
+        }
+    }
     public IReadOnlyList<string> NearestLoved  => _rec?.WhyLikedNames       ?? [];
     public IReadOnlyList<string> PenalizedBy   => _rec?.WhyPenalizedNames   ?? [];
 
