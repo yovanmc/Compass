@@ -4,13 +4,24 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
       xmlns:vm="clr-namespace:Compass.App.ViewModels"
+      xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
       mc:Ignorable="d"
       Background="#0A0A0A"
       d:DataContext="{d:DesignInstance vm:InsightsViewModel}">
     <Grid>
+        <!-- Loading -->
+        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="380"
+                    Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}">
+            <ui:ProgressRing IsIndeterminate="True" Width="36" Height="36" HorizontalAlignment="Center"/>
+            <TextBlock Text="Computing your taste &amp; recommender health…" Foreground="#8A8A8A" FontSize="13"
+                       HorizontalAlignment="Center" Margin="0,14,0,0"/>
+            <TextBlock Text="This runs a leave-one-out evaluation across your library; it can take a moment on a large one."
+                       Foreground="#5F5F5F" FontSize="11" TextWrapping="Wrap" TextAlignment="Center" Margin="0,6,0,0"/>
+        </StackPanel>
+
         <!-- Empty state -->
         <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="380"
-                    Visibility="{Binding IsEmpty, Converter={StaticResource BoolToVis}}">
+                    Visibility="{Binding ShowEmpty, Converter={StaticResource BoolToVis}}">
             <TextBlock Text="No games yet" Foreground="#8A8A8A" FontSize="16" FontWeight="SemiBold"
                        HorizontalAlignment="Center" Margin="0,0,0,6"/>
             <TextBlock Text="Add your Steam / IGDB keys and hit Sync, or load the built-in sample library from Settings → Load sample data."
@@ -19,7 +30,7 @@
 
         <!-- Content -->
         <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="32,24,32,32"
-                      Visibility="{Binding HasData, Converter={StaticResource BoolToVis}}">
+                      Visibility="{Binding ShowContent, Converter={StaticResource BoolToVis}}">
             <StackPanel MaxWidth="720" HorizontalAlignment="Left">
 
                 <TextBlock Text="Insights" Foreground="#EAEAEA" FontSize="20" FontWeight="SemiBold" Margin="0,0,0,4"/>

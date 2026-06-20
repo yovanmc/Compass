@@ -14,15 +14,40 @@ public sealed partial class InsightsViewModel : ObservableObject
     private readonly InsightsService _insights;
     private readonly RecommenderConfigState _state;
 
+    // Insights is computed LAZILY, off the UI thread, only when the page is shown.
+    // ComputeHealth runs a leave-one-out evaluation that is cheap on a tiny sample
+    // library but O(played² × candidates) on a real one — minutes on ~1000+ games.
+    // It must NEVER run during construction (that would block app startup) or on the
+    // UI thread (that would freeze the window). _dirty drives recompute-on-next-show.
+    private bool _dirty = true;
+    private CancellationTokenSource? _loadCts;
+
     [ObservableProperty]
     private bool isEmpty;
 
-    public bool HasData => !IsEmpty;
+    [ObservableProperty]
+    private bool isLoading = true;
 
-    partial void OnIsEmptyChanged(bool value) => OnPropertyChanged(nameof(HasData));
+    /// Three mutually-exclusive view states: loading spinner, empty onboarding, or content.
+    public bool ShowEmpty   => IsEmpty && !IsLoading;
+    public bool ShowContent => !IsEmpty && !IsLoading && Taste is not null;
+
+    partial void OnIsEmptyChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowEmpty));
+        OnPropertyChanged(nameof(ShowContent));
+    }
+
+    partial void OnIsLoadingChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowEmpty));
+        OnPropertyChanged(nameof(ShowContent));
+    }
 
     [ObservableProperty]
     private TasteProfile? taste;
+
+    partial void OnTasteChanged(TasteProfile? value) => OnPropertyChanged(nameof(ShowContent));
 
     [ObservableProperty]
     private RecommenderHealth? health;
@@ -41,32 +66,67 @@ public sealed partial class InsightsViewModel : ObservableObject
         _store = store;
         _insights = insights;
         _state = state;
-        Recompute();
+        // No eager compute: the page loads on demand via EnsureLoadedAsync() when shown.
     }
 
-    public void RefreshFromStore() => Recompute();
+    /// <summary>Marks the cached insights stale; the next time the page is shown it recomputes.</summary>
+    public void RefreshFromStore() => _dirty = true;
 
-    private void Recompute()
+    /// <summary>
+    /// Recomputes taste + health on a background thread if the data is stale, surfacing an
+    /// IsLoading state meanwhile. Idempotent — no-ops when already current. The view calls this
+    /// when the Insights page becomes visible.
+    /// </summary>
+    public async Task EnsureLoadedAsync()
     {
-        var lib = _store.LoadLibrary();
-        IsEmpty = lib.Count == 0;
+        if (!_dirty) return;
+        _dirty = false;
 
-        if (IsEmpty)
+        _loadCts?.Cancel();
+        var cts = new CancellationTokenSource();
+        _loadCts = cts;
+
+        // LoadLibrary is a cheap SQLite read (kept on the UI thread, as the other page VMs do).
+        var lib = _store.LoadLibrary();
+        if (lib.Count == 0)
         {
             Taste = null;
             Health = null;
             GenreBars = [];
             ThemeBars = [];
             PlaytimeBars = [];
+            IsEmpty = true;
+            IsLoading = false;
             return;
         }
 
-        Taste = _insights.AnalyzeTaste(lib, _state.Current);
-        Health = _insights.ComputeHealth(lib, _state.Current);
+        IsEmpty = false;
+        IsLoading = true;
+        var cfg = _state.Current;
 
-        GenreBars = BuildWeightBars(Taste.TopGenres);
-        ThemeBars = BuildWeightBars(Taste.TopThemes);
-        PlaytimeBars = BuildCountBars(Taste.PlaytimeDistribution);
+        try
+        {
+            // The expensive part (AnalyzeTaste + ComputeHealth) runs off the UI thread.
+            var (taste, health) = await Task.Run(
+                () => (_insights.AnalyzeTaste(lib, cfg), _insights.ComputeHealth(lib, cfg)),
+                cts.Token);
+
+            if (cts.IsCancellationRequested) return;   // a newer load superseded this one
+
+            Taste = taste;
+            Health = health;
+            GenreBars = BuildWeightBars(taste.TopGenres);
+            ThemeBars = BuildWeightBars(taste.TopThemes);
+            PlaytimeBars = BuildCountBars(taste.PlaytimeDistribution);
+        }
+        catch (OperationCanceledException)
+        {
+            // superseded by a newer EnsureLoadedAsync(); leave state to that newer load
+        }
+        finally
+        {
+            if (_loadCts == cts) IsLoading = false;
+        }
     }
 
     private static IReadOnlyList<BarRow> BuildWeightBars(IReadOnlyList<FeatureWeight> weights)

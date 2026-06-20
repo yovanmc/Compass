@@ -7,6 +7,7 @@
       xmlns:vm="clr-namespace:Compass.App.ViewModels"
       mc:Ignorable="d"
       Background="#0A0A0A"
+      Style="{StaticResource NavPageStyle}"
       d:DataContext="{d:DesignInstance vm:LibraryViewModel}">
 
     <Grid>
@@ -437,26 +438,32 @@
             </ListBox>
 
             <!-- ── POSTER GRID VIEW (IsPosterView = true) ────────────────── -->
-            <ScrollViewer Background="Transparent"
-                          VerticalScrollBarVisibility="Auto"
-                          Padding="12,6,12,12">
-                <ScrollViewer.Style>
-                    <Style TargetType="ScrollViewer">
-                        <Setter Property="Visibility" Value="Collapsed"/>
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding IsPosterView}" Value="True">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </ScrollViewer.Style>
-                <ItemsControl ItemsSource="{Binding Rows}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <WrapPanel Orientation="Horizontal"/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
+            <!-- Plain ItemsControl + WrapPanel (a WrapPanel can't virtualize), bound to the
+                 capped PosterRows slice so it never builds thousands of cover cards at once — the
+                 multi-second freeze came from realizing every card. The footer banner appears when
+                 the slice is truncated; the virtualized row view always shows the full set. -->
+            <DockPanel LastChildFill="True"
+                       Visibility="{Binding IsPosterView, Converter={StaticResource BoolToVis}}">
+                <Border DockPanel.Dock="Bottom"
+                        Background="#0D0D0D"
+                        BorderBrush="#222" BorderThickness="0,1,0,0"
+                        Padding="14,8"
+                        Visibility="{Binding PosterTruncated, Converter={StaticResource BoolToVis}}">
+                    <TextBlock Text="{Binding PosterOverflowText}"
+                               Foreground="#8A8A8A"
+                               FontSize="12"
+                               TextWrapping="Wrap"/>
+                </Border>
+                <ScrollViewer Background="Transparent"
+                              VerticalScrollBarVisibility="Auto"
+                              Padding="12,6,12,12">
+                    <ItemsControl ItemsSource="{Binding PosterRows}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:GameRow}">
                             <Border Width="210"
                                     Margin="0,0,10,10"
@@ -474,7 +481,7 @@
                                             Margin="0,0,0,8">
                                         <Image Stretch="UniformToFill"
                                                Visibility="{Binding CoverPath, Converter={StaticResource NullToVis}}"
-                                               Source="{Binding CoverPath, Converter={StaticResource PathToImageConverter}}"/>
+                                               Source="{Binding CoverPath, Converter={StaticResource PathToImageConverter}, ConverterParameter=200}"/>
                                     </Border>
 
                                     <!-- Name + score row -->
@@ -560,9 +567,10 @@
                                 </StackPanel>
                             </Border>
                         </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-            </ScrollViewer>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
 
         </Grid>
     </Grid>

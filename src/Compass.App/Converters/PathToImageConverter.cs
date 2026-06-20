@@ -21,6 +21,15 @@ public sealed class PathToImageConverter : IValueConverter
             var image = new BitmapImage();
             image.BeginInit();
             image.CacheOption   = BitmapCacheOption.OnLoad;
+            // Optional ConverterParameter = target decode width in pixels. Decoding small
+            // thumbnails (library covers) at display size instead of full resolution keeps
+            // bulk loads fast and cuts memory. Omit the parameter for full-res (detail view).
+            if (parameter is not null &&
+                int.TryParse(parameter.ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture, out int decodeWidth) &&
+                decodeWidth > 0)
+            {
+                image.DecodePixelWidth = decodeWidth;
+            }
             image.UriSource     = new Uri(path, UriKind.Absolute);
             image.EndInit();
             image.Freeze();

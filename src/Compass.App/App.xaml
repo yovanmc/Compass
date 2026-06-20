@@ -15,6 +15,17 @@
             <local:FractionToWidthConverter x:Key="FractionToWidth"/>
             <local:NullToVisibilityConverter x:Key="NullToVis"/>
             <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+            <!-- Cap every page to the NavigationView content viewport. WPF-UI hosts pages inside a
+                 DynamicScrollViewer that measures content with INFINITE height, which both defeats
+                 list virtualization (all rows realized → multi-second freeze on a large library)
+                 and leaves the page nothing of its own to scroll (dead mouse wheel). Binding
+                 MaxHeight to that outer ScrollViewer's ViewportHeight bounds each page so its own
+                 ListBox / ScrollViewer virtualizes and scrolls normally. -->
+            <Style x:Key="NavPageStyle" TargetType="{x:Type Page}">
+                <Setter Property="MaxHeight"
+                        Value="{Binding ViewportHeight, RelativeSource={RelativeSource AncestorType={x:Type ScrollViewer}}}"/>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

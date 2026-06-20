@@ -30,6 +30,14 @@ public sealed class InsightsService
     private const int TopN = 8;
     private const int HealthK = 10;
 
+    // Health evaluation is bounded to a fixed-size sample so it stays tractable on large
+    // libraries. Leave-one-out runs one full recommendation pass PER profile item, so unbounded
+    // it is O(profile × candidates) per scorer config × 7 configs — hours and gigabytes of GC
+    // churn on ~1000+ games. Libraries below these caps are evaluated exactly (so the unit-test
+    // fixtures and small real libraries are unaffected); larger ones get a sample ESTIMATE.
+    private const int MaxEvalProfile = 50;      // leave-one-out trials + profile size
+    private const int MaxEvalCandidates = 200;  // candidate pool the eval ranks against
+
     public TasteProfile AnalyzeTaste(IReadOnlyList<Game> library, RecommenderConfig cfg)
     {
         var affinity = new AffinityCalculator(cfg.PlayedFloorMinutes, cfg.RecencyWeight);
@@ -91,15 +99,20 @@ public sealed class InsightsService
                 candidates.Add(new CandidateItem(id, vec));
         }
 
+        // Bound the evaluation to a representative sample (highest-affinity played games + a
+        // candidate slice) so cost is ~constant regardless of library size.
+        var evalLiked = Sample(liked, MaxEvalProfile);
+        var evalCandidates = Sample(candidates, MaxEvalCandidates);
+
         var baseOptions = Options(cfg, cfg.ScorerMode, cfg.Diversity);
-        var (recall, diversity, coverage, spread) = Evaluate(liked, candidates, baseOptions);
+        var (recall, diversity, coverage, spread) = Evaluate(evalLiked, evalCandidates, baseOptions);
 
         var rows = new List<ScorerComparisonRow>();
         var deltas = cfg.Diversity > 0 ? new[] { 0.0, cfg.Diversity } : new[] { 0.0 };
         foreach (var mode in new[] { "NearestNeighbor", "Centroid", "Hybrid" })
             foreach (var delta in deltas)
             {
-                var (r, d, c, _) = Evaluate(liked, candidates, Options(cfg, mode, delta));
+                var (r, d, c, _) = Evaluate(evalLiked, evalCandidates, Options(cfg, mode, delta));
                 rows.Add(new ScorerComparisonRow(mode, delta, r, d, c));
             }
 
@@ -122,7 +135,20 @@ public sealed class InsightsService
         IReadOnlyList<ProfileItem> liked, IReadOnlyList<CandidateItem> candidates, RecommenderOptions options)
     {
         var evaluator = new RecommenderEvaluator();
-        double recall = evaluator.LeaveOneOutRecallAtK(liked, candidates, HealthK, options);
+
+        // Recall@k is a relevance metric. Computing it under MMR diversity would run an O(n²)
+        // re-rank inside every leave-one-out trial — the dominant blowup — so force diversity off
+        // for recall. The diversity/coverage/spread below still use the requested δ.
+        var recallOptions = new RecommenderOptions
+        {
+            K = options.K,
+            Mode = options.Mode,
+            CategoryWeights = options.CategoryWeights,
+            NegativeWeight = options.NegativeWeight,
+            HybridAlpha = options.HybridAlpha,
+            Diversity = 0,
+        };
+        double recall = evaluator.LeaveOneOutRecallAtK(liked, candidates, HealthK, recallOptions);
 
         var ranked = new ContentRecommender().Recommend(liked, candidates, options, null);
         var byId = candidates.ToDictionary(c => c.ItemId, c => c.Features);
@@ -145,6 +171,15 @@ public sealed class InsightsService
         return tally.OrderByDescending(kv => kv.Value).Take(TopN)
             .Select(kv => new InfluentialGame(kv.Key, kv.Value)).ToList();
     }
+
+    // Down-sample the evaluation inputs on large libraries. Profile is sampled by affinity
+    // (the most-played games carry the strongest taste signal); candidates take a deterministic
+    // slice. Below the cap the original list is returned unchanged (exact evaluation).
+    private static IReadOnlyList<ProfileItem> Sample(IReadOnlyList<ProfileItem> items, int max)
+        => items.Count <= max ? items : items.OrderByDescending(i => i.Affinity).Take(max).ToList();
+
+    private static IReadOnlyList<CandidateItem> Sample(IReadOnlyList<CandidateItem> items, int max)
+        => items.Count <= max ? items : items.Take(max).ToList();
 
     private static void Add(Dictionary<string, double> d, string k, double v) =>
         d[k] = d.GetValueOrDefault(k) + v;

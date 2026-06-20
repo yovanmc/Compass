@@ -21,6 +21,15 @@ public sealed class RecommendationService
 {
     public const int SampledThresholdMinutes = 30;
 
+    /// <summary>
+    /// How many top-relevance candidates the MMR diversity pass re-ranks on large libraries.
+    /// MMR is O(n²) in candidates, so re-ranking every candidate is prohibitively slow (~42s on
+    /// ~940 games). We surface far fewer than this, so shortlisting keeps the result identical in
+    /// practice while making the pass fast. Only engages when Diversity &gt; 0 and the candidate
+    /// count exceeds it; smaller sets fall through to a single exact pass.
+    /// </summary>
+    private const int DiversityRerankPool = 200;
+
     private readonly IRecommender _recommender;
     public RecommendationService(IRecommender? recommender = null)
         => _recommender = recommender ?? new ContentRecommender();
@@ -99,6 +108,29 @@ public sealed class RecommendationService
                 if (vec.IsEmpty) unscored.Add(g);
                 else candidates.Add(new CandidateItem(id, vec));
             }
+        }
+
+        // Two-pass diversity shortlist. The MMR re-rank inside the engine is O(n²) in the
+        // candidate count, so on a large library running it over every backlog game is the
+        // dominant cost (~42s on ~940 candidates vs ~270ms with diversity off). Because we only
+        // ever surface the top results, first rank by relevance (δ=0 — the cheap path) to pick the
+        // strongest candidates, then run the full MMR diversity pass over just that shortlist.
+        // Small libraries and δ=0 are unaffected: the guard falls through to a single exact pass.
+        if (options.Diversity > 0 && candidates.Count > DiversityRerankPool)
+        {
+            var relevanceOptions = new RecommenderOptions
+            {
+                K = options.K,
+                Mode = options.Mode,
+                CategoryWeights = options.CategoryWeights,
+                NegativeWeight = options.NegativeWeight,
+                HybridAlpha = options.HybridAlpha,
+                Diversity = 0,
+            };
+            var prelim = _recommender.Recommend(liked, candidates, relevanceOptions, disliked);
+            var keep = prelim.Recommendations.Take(DiversityRerankPool)
+                .Select(r => r.ItemId).ToHashSet();
+            candidates = candidates.Where(c => keep.Contains(c.ItemId)).ToList();
         }
 
         var ranked = _recommender.Recommend(liked, candidates, options, disliked);

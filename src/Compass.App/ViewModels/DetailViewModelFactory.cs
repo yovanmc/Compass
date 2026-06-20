@@ -1,3 +1,4 @@
+using Compass.Core.Config;
 using Compass.Core.Covers;
 using Compass.Core.Sync;
 using Compass.Core.Taste;
@@ -33,8 +34,25 @@ public sealed class DetailViewModelFactory
         var game = library.FirstOrDefault(g => g.SteamAppId == appId)
             ?? throw new InvalidOperationException($"Game with appId {appId} not found in library.");
 
-        // Run recommendation to find this game's score/breakdown, if it is a backlog candidate.
-        var result = _recs.Recommend(library, _state.Current);
+        // Find this game's score/breakdown. Use a relevance-only pass (diversity OFF): MMR only
+        // reorders results and, on a large library, shortlists candidates to the strongest few
+        // hundred — it never changes an individual game's score. δ=0 therefore guarantees every
+        // backlog game has its score available here, and it's the cheaper path.
+        var cfg = _state.Current;
+        var relevanceCfg = new RecommenderConfig
+        {
+            PlayedFloorMinutes   = cfg.PlayedFloorMinutes,
+            RecencyWeight        = cfg.RecencyWeight,
+            K                    = cfg.K,
+            ScorerMode           = cfg.ScorerMode,
+            CategoryWeights      = cfg.CategoryWeights,
+            NegativeWeight       = cfg.NegativeWeight,
+            UseImplicitNegatives = cfg.UseImplicitNegatives,
+            HybridAlpha          = cfg.HybridAlpha,
+            Diversity            = 0,
+            FeedbackWeight       = cfg.FeedbackWeight,
+        };
+        var result = _recs.Recommend(library, relevanceCfg);
         var rec = result.Recommendations.FirstOrDefault(r => r.Game.SteamAppId == appId);
 
         var similar = _recs.SimilarTo(library, appId, 6)

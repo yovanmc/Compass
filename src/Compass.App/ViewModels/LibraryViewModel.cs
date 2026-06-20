@@ -23,6 +23,22 @@ public sealed partial class LibraryViewModel : ObservableObject
     // ── Displayed rows ─────────────────────────────────────────────────────
     public ObservableCollection<GameRow> Rows { get; } = new();
 
+    /// <summary>
+    /// The poster grid is non-virtualizing (a WrapPanel can't virtualize), so it renders only
+    /// a capped slice of <see cref="Rows"/> — building thousands of cover cards at once is a
+    /// multi-second freeze. The full set always remains available in the virtualized row view.
+    /// </summary>
+    private const int PosterDisplayCap = 250;
+
+    [ObservableProperty]
+    private IReadOnlyList<GameRow> posterRows = [];
+
+    [ObservableProperty]
+    private bool posterTruncated;
+
+    [ObservableProperty]
+    private string posterOverflowText = string.Empty;
+
     [ObservableProperty]
     private bool isLibraryEmpty = true;
 
@@ -176,6 +192,22 @@ public sealed partial class LibraryViewModel : ObservableObject
         {
             double score = _scoreByAppId.TryGetValue(g.SteamAppId, out var s) ? s : 0;
             Rows.Add(GameRow.From(g, score, _state.Current.PlayedFloorMinutes));
+        }
+
+        // Poster view renders a capped slice (it doesn't virtualize); these reference the same
+        // GameRow instances as Rows, so covers load once. Row view always shows the full set.
+        if (Rows.Count > PosterDisplayCap)
+        {
+            PosterRows = Rows.Take(PosterDisplayCap).ToList();
+            PosterTruncated = true;
+            PosterOverflowText =
+                $"Showing first {PosterDisplayCap:N0} of {Rows.Count:N0} — refine with search or filters, or use row view for the full list.";
+        }
+        else
+        {
+            PosterRows = Rows.ToList();
+            PosterTruncated = false;
+            PosterOverflowText = string.Empty;
         }
 
         // Cancel stale cover loads and start new ones for the current rows.
