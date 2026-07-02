@@ -65,3 +65,9 @@ dotnet user-secrets set "Igdb:ClientSecret" "YOUR_TWITCH_CLIENT_SECRET"
 Get keys: Steam Web API key at https://steamcommunity.com/dev/apikey ; IGDB uses a Twitch
 dev app (Client ID + Secret) at https://dev.twitch.tv/console/apps. SteamID64 is already set
 (non-secret) in `appsettings.json`.
+
+## How this was built
+
+This repo was designed, specified, and reviewed by me, and implemented through my multi-agent development workflow: AI subagents execute written plans, with adversarial review gates (plan critique, code review, test verification) between phases. Every architectural decision is mine, and the process is left visible in the history and `docs/superpowers/` on purpose.
+
+The productized form of that workflow is [backend-harness](https://github.com/yovanmc/backend-harness). If you're evaluating my work: ask me why the recommender core has zero package references, or how the MMR re-ranking trades relevance against diversity — I'll defend the design from first principles.
