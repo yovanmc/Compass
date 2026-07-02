@@ -1,5 +1,7 @@
 # Compass
 
+[![CI](https://github.com/yovanmc/Compass/actions/workflows/ci.yml/badge.svg)](https://github.com/yovanmc/Compass/actions/workflows/ci.yml)
+
 A personal, single-user game backlog manager and recommendation engine for Windows.
 
 Compass pulls your own Steam library and playtime into a local SQLite database, enriches
