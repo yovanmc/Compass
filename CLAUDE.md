@@ -24,7 +24,7 @@ Client ID+Secret) injected via `dotnet user-secrets` — not present in this env
 
 ```powershell
 # Build (Debug)
-dotnet build src/Compass.App/Compass.App.csproj -c Debug
+dotnet build src/Compass.App/Compass.App.csproj -c Debug -v minimal
 
 # Full test suite (xUnit + FluentAssertions, 3 test projects)
 dotnet test
