@@ -1,8 +1,11 @@
 # Compass — agent/developer runbook
 
-No ROADMAP.md in this repo. State lives in `docs/superpowers/specs/` (design docs) and
-`docs/superpowers/plans/` (phased implementation plans), one pair per version (v1–v4). Check
-the latest-dated plan file for current status and the phase checklist convention.
+**Read `NORTHSTAR.md` before planning anything here** — Compass is PARKED entirely as of
+2026-07-07; only one action is sanctioned while parked (see that file).
+
+`ROADMAP.md` is the source of truth for status (present since 2026-07-03). State also lives in
+`docs/superpowers/specs/` (design docs) and `docs/superpowers/plans/` (phased implementation
+plans), one pair per version (v1–v4). Check the latest-dated plan file for implementation detail.
 
 ## What this is
 
@@ -43,7 +46,8 @@ dotnet user-secrets set "Igdb:ClientId"     "..."
 dotnet user-secrets set "Igdb:ClientSecret" "..."
 ```
 
-No `.github/workflows` — no CI. Verification is manual/local only.
+CI runs via `.github/workflows/ci.yml` (build + test on push/PR, added 2026-07-02, PR #4). Manual
+smoke-launch verification (below) still applies for anything CI can't cover (rendered UI content).
 
 ## Verification harness
 
