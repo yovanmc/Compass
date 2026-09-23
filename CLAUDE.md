@@ -57,9 +57,8 @@ sample data and look.
 
 ## Conventions & safety
 
-- Work on a `feat/compass-vN` branch; land via **fast-forward merge to `main`** (not PR/squash),
-  re-verify build+test on `main` after merging, then push `origin main`, then delete the feature
-  branch. **Pause for owner confirmation before the public push** (standing pre-push rule — this
+- Work on a feature branch and land it through a PR: `gh pr checks <#> --watch`, then
+  `gh pr merge --merge --delete-branch`. **Pause for owner confirmation before the public push** (standing pre-push rule — this
   is a public repo).
 - Commit identity: `yovanmc <yovanmc@users.noreply.github.com>`, plain `git commit` (no
   `-c`/`--author` overrides).

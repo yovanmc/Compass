@@ -49,8 +49,8 @@ own API keys (see below).
 
 ## Secrets / configuration
 
-Secrets are **never** committed. Development uses .NET User Secrets (see the
-`dotnet user-secrets set` block left in the app project). Your SteamID64 is not a secret
+Secrets are **never** committed. Development uses .NET User Secrets (see
+Local setup below). Your SteamID64 is not a secret
 and lives in `appsettings.json`.
 
 ## Local setup (run once)

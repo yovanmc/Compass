@@ -24,7 +24,7 @@ Repo: github.com/yovanmc/Compass (PUBLIC) · this clone: `C:\Agent Projects\Comp
 | U1 | Usage window (~3 weeks) | [ ] | BLOCKED: v5 | — | Use Compass at real "what do I play tonight" moments. Friction/perf/bugs logged as the v6 backlog. Usage-before-features gate |
 | v6 | Usage-fed fixes (perf + bugs) | [ ] | BLOCKED: U1 | — | Backlog = the U1 log only. Speculative perf work declined |
 | X | Recommender extraction | [ ] | BLOCKED: Curio recommender integration begins | — | Extract `Compass.Recommender` into a shared library once a second consumer exists. Compass becomes consumer #1 and the purity rule becomes the library contract |
-| H | Remote branch cleanup | [ ] | BACKLOG | — | Delete merged remote branches (`ci/github-actions`, `docs/how-this-was-built`, `docs/roadmap-onboarding`) and resolve the unclear `docs/quiet-build` branch. Batch with any future touch |
+| H | Remote branch cleanup | [ ] | BACKLOG | — | Delete merged remote branches (`ci/github-actions`, `docs/how-this-was-built`, `docs/roadmap-onboarding`, `docs/northstar-2026-07`, `chore/current-state-docs`, `chore/prompt-audit-2026-09-23`) and resolve the unmerged `docs/quiet-build` and `chore/single-file-publish` branches. Batch with any future touch |
 
 ## Pointers
 

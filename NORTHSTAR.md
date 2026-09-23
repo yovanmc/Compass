@@ -1,16 +1,16 @@
-# Compass — North Star (2026-07-07 grilling session)
+# Compass — North Star
 
-## What this builds up to be (end-state vision, owner-locked 2026-07-07)
+## What this builds up to be (end-state vision)
 **Compass, finished, is a standalone occasional-use game picker that shares its extracted recommender core with Curio.** Two decisions define the end state:
 
 - **Standalone product, permanently.** Compass remains a living app for "what do I play tonight" even after Curio integrates the recommender for media — games and media library are distinct use cases with distinct feature vectors. It does not get absorbed or archived as a donor.
-- **The core gets extracted for real.** Curio's end-state vision (locked this session) names the Compass pure-recommender core as its media-recommendation engine. That makes **two consumers**, which is exactly the standing trigger for the NuGet/shared-library extraction — so the extraction genuinely happens at that Curio milestone, and `Compass.Recommender`'s purity rule becomes a shared-library contract, not just project hygiene.
+- **The core gets extracted for real.** Curio's end-state vision names the Compass pure-recommender core as its media-recommendation engine. That makes **two consumers**, which is exactly the standing trigger for the NuGet/shared-library extraction — so the extraction genuinely happens at that Curio milestone, and `Compass.Recommender`'s purity rule becomes a shared-library contract, not just project hygiene.
 - **Finished Compass, concretely:** live pull verified and working; the real backlog in the DB; recommendations trusted enough that the owner actually consults it on game nights; relevance feedback tuning the model over time. Small, done, occasionally used — like a good kitchen tool.
 - **Never:** multi-store aggregation, social features, non-Steam sources, portfolio positioning.
 
 **v-final test:** on a real game night, it recommends something from your actual backlog, you play it, and the pick was better than scrolling the library.
 
-## Path to v-final (rough build outline, 2026-07-07)
+## Path to v-final (rough build outline)
 Smallest path in the portfolio. The park governs timing; this is the whole remaining map.
 
 **Step 1 — v5: the 30-minute live-pull verification (the one sanctioned action).** Run the real Steam + IGDB pull on the owner's machine; fix whatever auth/fetch/appID-matching bugs surface (code that has never run once usually has some). Success = the owner's actual backlog in the local DB.
@@ -24,9 +24,9 @@ Smallest path in the portfolio. The park governs timing; this is the whole remai
 **Maintenance forever after:** nothing, unless it breaks on a game night.
 
 ## North Star (operating identity)
-An **occasional-use backlog picker** ("what do I play tonight") built around a deliberately pure, reusable recommender core (kNN+IDF+MMR, zero package references). Status as of this session: **PARKED entirely, by owner decision** — no development, nothing queued. The park governs *when* anything happens; the vision above governs *what* it builds toward.
+An **occasional-use backlog picker** ("what do I play tonight") built around a deliberately pure, reusable recommender core (kNN+IDF+MMR, zero package references). Status: **PARKED entirely, by owner decision** — no development, nothing queued. The park governs *when* anything happens; the vision above governs *what* it builds toward.
 
-## Owner decisions locked this session
+## Owner decisions
 1. **The problem is real:** owner confirms backlog-choice paralysis recurs regularly.
 2. **Parked anyway, including the v5 live-pull verification.** Owner chose "park entirely" with the pushback in view.
 
@@ -41,13 +41,12 @@ These two answers conflict: a regularly recurring problem + a working tool parke
 
 ## Non-goals (standing, reaffirmed — do not re-propose)
 - Speculative perf/bug work before real usage.
-- Portfolio positioning polish (owner declared Compass explicitly not a portfolio artifact, 2026-07-03).
+- Portfolio positioning polish (owner declared Compass explicitly not a portfolio artifact).
 - Recommender NuGet extraction until a second consumer actually exists.
 - Any impurity leaking into `Compass.Recommender` (no Steam/IGDB/DB/feedback types).
 
 ## Hygiene backlog (batch with any future touch)
-- CLAUDE.md is stale and self-contradictory (claims no ROADMAP, no CI — both false since 2026-07-02/03).
-- Delete merged remote branches (`ci/github-actions`, `docs/how-this-was-built`, `docs/roadmap-onboarding`); resolve the unclear `docs/quiet-build` branch (last commit 2026-07-02).
+- Delete merged remote branches (`ci/github-actions`, `docs/how-this-was-built`, `docs/roadmap-onboarding`, `docs/northstar-2026-07`, `chore/current-state-docs`, `chore/prompt-audit-2026-09-23`). Resolve the unmerged `docs/quiet-build` and `chore/single-file-publish` branches.
 
 ## Kill criteria
 None needed. Compass is finished software with one unverified seam. The pure recommender core is a durable reusable asset regardless of whether the app is ever used. The only failure mode left is pretending v1–v4 are "done" while the pull stays forever unrun — the contradiction section above exists so that pretense has to be re-read every time the project is touched.
