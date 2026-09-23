@@ -32,7 +32,6 @@ Repo: github.com/yovanmc/Compass (PUBLIC) · this clone: `C:\Agent Projects\Comp
 - Build: `dotnet build Compass.slnx -v minimal` · Test: `dotnet test Compass.slnx` · CI: `.github/workflows/ci.yml`
 - Secrets: User Secrets (`compass-72b1f6a2-2026`) hold `Steam:ApiKey`, `Igdb:ClientId`, `Igdb:ClientSecret`. Never committed, placeholders only in `appsettings.json`
 - Land work: branch → PR → `gh pr checks <#> --watch` → merge `--merge --delete-branch`. Commit as `yovanmc <yovanmc@users.noreply.github.com>`, plain `git commit` (never `--author`)
-- Screenshot verify: a pinned helper returns a text verdict. PNGs never enter the planning session
 - Keyless demo: Settings → **Load sample data** (~40-game sample) / **Clear library** (reversible)
 - WAL SQLite in tests needs `SqliteConnection.ClearAllPools()` in cleanup. `SQLitePCLRaw` is pinned to clear the bundled-SQLite CVE
 - `Compass.Recommender` stays PURE: no Steam/IGDB/game types leak into it
