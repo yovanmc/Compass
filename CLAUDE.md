@@ -18,7 +18,7 @@ Solution `Compass.slnx`, 4-project layering `App → Data → Core → Recommend
 
 Public repo. Everything runs keyless off the
 local SQLite cache (including a baked-in ~40-game sample library via Settings → Load sample
-data). Live Steam/IGDB sync is gated on the owner's own API keys (Steam Web API key, IGDB/Twitch
+data). Live Steam/IGDB sync is gated on Yovan's own API keys (Steam Web API key, IGDB/Twitch
 Client ID+Secret) injected via `dotnet user-secrets` — not present in this environment.
 
 ## Commands
@@ -52,13 +52,13 @@ smoke-launch verification (below) still applies for anything CI can't cover (ren
 No `verify/` scripts or screenshot tooling. Verify with a **smoke launch**: start with a fresh
 temp `--db`, confirm the process stays alive ≥5s with a non-zero `MainWindowHandle` and no
 XAML-parse crash, then kill it. An empty `--db` renders the empty state (expected). Headless
-checks stop at process-alive + handle: populated pages need the owner to run Settings → Load
+checks stop at process-alive + handle: populated pages need Yovan to run Settings → Load
 sample data and look.
 
 ## Conventions & safety
 
 - Work on a feature branch and land it through a PR: `gh pr checks <#> --watch`, then
-  `gh pr merge --merge --delete-branch`. **Pause for owner confirmation before the public push** (standing pre-push rule — this
+  `gh pr merge --merge --delete-branch`. **Pause for Yovan's confirmation before the public push** (standing pre-push rule — this
   is a public repo).
 - Commit identity: `yovanmc <yovanmc@users.noreply.github.com>`, plain `git commit` (no
   `-c`/`--author` overrides).
