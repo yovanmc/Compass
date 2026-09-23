@@ -45,13 +45,12 @@ right-side game **detail** slide-over with keyless Steam cover art — and deepe
   your taste profile (a soft signal, distinct from Hide), tunable via a **Feedback weight** knob.
 
 Everything above runs entirely off the local SQLite cache. Live Steam/IGDB sync still needs your
-own API keys (see below). See the design docs in [`docs/superpowers/specs`](docs/superpowers/specs)
-for scope and architecture.
+own API keys (see below).
 
 ## Secrets / configuration
 
-Secrets are **never** committed. Development uses .NET User Secrets (see the design doc and
-the `dotnet user-secrets set` block left in the app project). Your SteamID64 is not a secret
+Secrets are **never** committed. Development uses .NET User Secrets (see the
+`dotnet user-secrets set` block left in the app project). Your SteamID64 is not a secret
 and lives in `appsettings.json`.
 
 ## Local setup (run once)
@@ -70,6 +69,6 @@ dev app (Client ID + Secret) at https://dev.twitch.tv/console/apps. SteamID64 is
 
 ## How this was built
 
-This repo was designed, specified, and reviewed by me, and implemented through my multi-agent development workflow: AI subagents execute written plans, with adversarial review gates (plan critique, code review, test verification) between phases. Every architectural decision is mine, and the process is left visible in the history and `docs/superpowers/` on purpose.
+This repo was designed, specified, and reviewed by me, and implemented through my multi-agent development workflow: AI subagents execute written plans, with adversarial review gates (plan critique, code review, test verification) between phases. Every architectural decision is mine, and the process is left visible in the git history on purpose.
 
 The productized form of that workflow is [backend-harness](https://github.com/yovanmc/backend-harness). If you're evaluating my work: ask me why the recommender core has zero package references, or how the MMR re-ranking trades relevance against diversity — I'll defend the design from first principles.

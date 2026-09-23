@@ -1,11 +1,9 @@
 # Compass — agent/developer runbook
 
-**Read `NORTHSTAR.md` before planning anything here** — Compass is PARKED entirely as of
-2026-07-07; only one action is sanctioned while parked (see that file).
+**Read `NORTHSTAR.md` before planning anything here.** Compass is PARKED entirely and only one
+action is sanctioned while parked (see that file).
 
-`ROADMAP.md` is the source of truth for status. State also lives in
-`docs/superpowers/specs/` (design docs) and `docs/superpowers/plans/` (phased implementation
-plans), one pair per version (v1–v4). Check the latest-dated plan file for implementation detail.
+`ROADMAP.md` is the source of truth for status.
 
 ## What this is
 
@@ -18,7 +16,7 @@ Solution `Compass.slnx`, 4-project layering `App → Data → Core → Recommend
 - `src/Compass.Data` — SQLite storage/migrations.
 - `src/Compass.App` — WPF-UI (Fluent dark theme) shell, MVVM (CommunityToolkit.Mvvm).
 
-Public repo. v4 (insights + relevance feedback) is on `main`. Everything runs keyless off the
+Public repo. Everything runs keyless off the
 local SQLite cache (including a baked-in ~40-game sample library via Settings → Load sample
 data). Live Steam/IGDB sync is gated on the owner's own API keys (Steam Web API key, IGDB/Twitch
 Client ID+Secret) injected via `dotnet user-secrets` — not present in this environment.
@@ -51,7 +49,7 @@ smoke-launch verification (below) still applies for anything CI can't cover (ren
 
 ## Verification harness
 
-No dedicated `verify/` scripts or screenshot tooling in this repo. The plans use a recurring
+No dedicated `verify/` scripts or screenshot tooling in this repo. Verification uses a
 **smoke-launch** pattern instead of screenshots: launch with a fresh temp `--db`, confirm the
 process stays alive ≥5s with a non-zero `MainWindowHandle` and no XAML-parse crash, then kill
 it. An empty `--db` renders the app's empty-state (expected, not a bug) — populated-page checks
@@ -78,14 +76,14 @@ automated headlessly.
 
 ## Cross-cutting gotchas
 
-- Additive-only DB migrations (e.g. v4 added one `games.feedback` column) — no destructive schema
+- Additive-only DB migrations — no destructive schema
   rewrites; migration tests assert the version bump.
 - The engine has no native "feedback" concept — explicit more/less-like-this is translated into
   weighted liked/disliked signal in `Compass.Core.RecommendationService`, gated so it doesn't
   double-count with the existing implicit-negative (`NotInterested`) branch.
 - `Diversity = 0` must reproduce the pre-MMR ranking exactly — the diversity slider re-orders
   results only, it never changes the displayed match score.
-- Large-library performance (scrolling/recompute cost) has bitten before (see `307bd02`) — watch
+- Large-library performance (scrolling/recompute cost) is fragile. Watch
   recompute cost when touching the Recommend/Library hot path.
 - Headless app testing is limited to process-alive + handle checks; there is no automated way to
   verify rendered UI content without the owner eyeballing a populated run.
