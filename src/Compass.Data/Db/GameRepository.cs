@@ -1,5 +1,4 @@
 using Compass.Core.Model;
-using Microsoft.Data.Sqlite;
 
 namespace Compass.Data.Db;
 
