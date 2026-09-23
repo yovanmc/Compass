@@ -66,7 +66,6 @@ public sealed class GameRepository
         using var conn = _db.OpenConnection();
         using var tx = conn.BeginTransaction();
 
-        // Delete existing game_features for this igdb_id first
         using (var del = conn.CreateCommand())
         {
             del.Transaction = tx;
@@ -75,7 +74,6 @@ public sealed class GameRepository
             del.ExecuteNonQuery();
         }
 
-        // Insert features (upsert vocab) and game_features rows separately
         foreach (var (key, category, name) in features)
         {
             using var fcmd = conn.CreateCommand();

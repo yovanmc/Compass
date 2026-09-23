@@ -77,7 +77,7 @@ public sealed class RecommendationService
             {
                 var fw = cfg.FeedbackWeight * Math.Log(1 + cfg.PlayedFloorMinutes);
                 if (g.Feedback > 0) liked.Add(new ProfileItem(id, vec, fw));
-                // NOTE: the disliked signal only penalizes candidates when NegativeWeight > 0.
+                // The disliked signal only penalizes candidates when NegativeWeight > 0.
                 // With NegativeWeight = 0, "Less like this" is inert regardless of FeedbackWeight.
                 else                disliked.Add(new ProfileItem(id, vec, fw));
             }
@@ -164,11 +164,11 @@ public sealed class RecommendationService
         var candidates = new List<CandidateItem>();
         foreach (var g in library)
         {
-            if (g.SteamAppId == seedAppId) continue;   // exclude seed
-            if (g.NotInterested) continue;              // exclude not-interested
+            if (g.SteamAppId == seedAppId) continue;
+            if (g.NotInterested) continue;
 
             var vec = GameFeatureExtractor.ToVector(g);
-            if (vec.IsEmpty) continue;                  // exclude no-feature games
+            if (vec.IsEmpty) continue;
 
             var id = g.SteamAppId.ToString();
             byId[id] = g;
@@ -186,8 +186,6 @@ public sealed class RecommendationService
             .Select(r => MapRecommendation(r, byId))
             .ToList();
     }
-
-    // ── Private helpers ───────────────────────────────────────────────────────
 
     private static GameRecommendation MapRecommendation(Recommendation r, Dictionary<string, Game> byId)
     {

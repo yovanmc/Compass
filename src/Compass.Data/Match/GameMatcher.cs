@@ -16,13 +16,12 @@ public sealed class GameMatcher : IGameMatcher
         var outcomes = new List<MatchOutcome>(games.Count);
         var appIds = games.Select(g => g.appId).ToList();
 
-        // Tier 1: external_games appID lookup.
-        // IMPORTANT: external_games can return multiple rows per appId (regional entries, etc.).
-        // Build a dedup-safe lookup by taking the first match per appId (last-wins via loop).
+        // Tier 1: external_games appID lookup. It can return several rows per appId (regional
+        // entries); any one is a valid match.
         var tier1Results = await _igdb.MatchBySteamAppIdsAsync(appIds, ct);
         var tier1 = new Dictionary<int, IgdbMatch>();
         foreach (var m in tier1Results)
-            tier1[m.SteamAppId] = m; // last-write-wins; any valid match is fine
+            tier1[m.SteamAppId] = m;
 
         foreach (var (appId, name) in games)
         {

@@ -16,14 +16,12 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- ═══ TOOLBAR ══════════════════════════════════════════════════════ -->
         <Border Grid.Row="0"
                 Background="#0D0D0D"
                 BorderBrush="#222" BorderThickness="0,0,0,1"
                 Padding="12,8">
             <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
 
-                <!-- Search box -->
                 <TextBox Width="200"
                          Margin="0,0,8,0"
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}"
@@ -46,7 +44,6 @@
                                                 BorderThickness="{TemplateBinding BorderThickness}"
                                                 CornerRadius="4">
                                             <Grid>
-                                                <!-- Placeholder -->
                                                 <TextBlock Text="Search games…"
                                                            Foreground="#5F5F5F"
                                                            FontSize="13"
@@ -76,7 +73,6 @@
                     </TextBox.Style>
                 </TextBox>
 
-                <!-- Status filter -->
                 <ComboBox ItemsSource="{Binding Statuses}"
                           SelectedItem="{Binding SelectedStatus}"
                           Width="110"
@@ -95,7 +91,6 @@
                     </ComboBox.Resources>
                 </ComboBox>
 
-                <!-- Facet / genre filter -->
                 <ComboBox ItemsSource="{Binding Facets}"
                           SelectedValue="{Binding SelectedFacet}"
                           SelectedValuePath="Key"
@@ -116,7 +111,6 @@
                     </ComboBox.Resources>
                 </ComboBox>
 
-                <!-- Sort -->
                 <ComboBox ItemsSource="{Binding Sorts}"
                           SelectedItem="{Binding SelectedSort}"
                           Width="130"
@@ -135,13 +129,11 @@
                     </ComboBox.Resources>
                 </ComboBox>
 
-                <!-- Rows / Poster toggle -->
                 <Border Background="#141414"
                         BorderBrush="#2A2A2A" BorderThickness="1"
                         CornerRadius="4"
                         Height="30">
                     <StackPanel Orientation="Horizontal">
-                        <!-- Row view button -->
                         <ToggleButton IsChecked="{Binding IsPosterView, Converter={StaticResource InverseBoolConverter}, Mode=OneWay}"
                                       Command="{x:Null}"
                                       Click="RowViewButton_Click"
@@ -184,7 +176,6 @@
                                 </Style>
                             </ToggleButton.Style>
                         </ToggleButton>
-                        <!-- Poster view button -->
                         <ToggleButton IsChecked="{Binding IsPosterView, Mode=OneWay}"
                                       Command="{x:Null}"
                                       Click="PosterViewButton_Click"
@@ -233,7 +224,6 @@
             </WrapPanel>
         </Border>
 
-        <!-- ═══ CONTENT ══════════════════════════════════════════════════════ -->
         <Grid Grid.Row="1">
 
             <!-- Empty-state onboarding overlay (no games in library at all) -->
@@ -263,7 +253,6 @@
                 </TextBlock.Style>
             </TextBlock>
 
-            <!-- ── COMPACT ROW VIEW (IsPosterView = false) ───────────────── -->
             <ListBox ItemsSource="{Binding Rows}"
                      SelectedItem="{Binding SelectedRow}"
                      Background="Transparent"
@@ -327,7 +316,6 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
 
-                            <!-- Cover (46×64): placeholder shown when CoverPath null, image shown when non-null -->
                             <Border Grid.Column="0"
                                     Width="46" Height="64"
                                     Background="#222"
@@ -339,7 +327,6 @@
                                        Source="{Binding CoverPath, Converter={StaticResource PathToImageConverter}}"/>
                             </Border>
 
-                            <!-- Name + feature tags -->
                             <StackPanel Grid.Column="1" VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Name, Mode=OneWay}"
                                            Foreground="#EAEAEA"
@@ -356,14 +343,12 @@
                                 </TextBlock>
                             </StackPanel>
 
-                            <!-- Status pill + score -->
                             <StackPanel Grid.Column="2"
                                         Orientation="Vertical"
                                         VerticalAlignment="Center"
                                         HorizontalAlignment="Right"
                                         Margin="10,0,0,0">
 
-                                <!-- Status pill -->
                                 <Border CornerRadius="10"
                                         Padding="7,2"
                                         HorizontalAlignment="Right"
@@ -412,7 +397,6 @@
                                     </TextBlock>
                                 </Border>
 
-                                <!-- Score (gold, NN%) — only shown when score > 0 -->
                                 <TextBlock HorizontalAlignment="Right"
                                            Foreground="#EBB740"
                                            FontSize="12"
@@ -437,11 +421,9 @@
                 </ListBox.ItemTemplate>
             </ListBox>
 
-            <!-- ── POSTER GRID VIEW (IsPosterView = true) ────────────────── -->
-            <!-- Plain ItemsControl + WrapPanel (a WrapPanel can't virtualize), bound to the
-                 capped PosterRows slice so it never builds thousands of cover cards at once — the
-                 multi-second freeze came from realizing every card. The footer banner appears when
-                 the slice is truncated; the virtualized row view always shows the full set. -->
+            <!-- A WrapPanel can't virtualize, so this binds the capped PosterRows slice instead of
+                 building thousands of cover cards at once. The footer banner shows when the slice is
+                 truncated; the virtualized row view always shows the full set. -->
             <DockPanel LastChildFill="True"
                        Visibility="{Binding IsPosterView, Converter={StaticResource BoolToVis}}">
                 <Border DockPanel.Dock="Bottom"
@@ -474,7 +456,6 @@
                                     Cursor="Hand"
                                     MouseLeftButtonUp="PosterCard_Click">
                                 <StackPanel>
-                                    <!-- Cover (190×100): placeholder shown when CoverPath null, image when non-null -->
                                     <Border Width="190" Height="100"
                                             Background="#222"
                                             CornerRadius="4"
@@ -484,7 +465,6 @@
                                                Source="{Binding CoverPath, Converter={StaticResource PathToImageConverter}, ConverterParameter=200}"/>
                                     </Border>
 
-                                    <!-- Name + score row -->
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="*"/>
@@ -516,7 +496,6 @@
                                         </controls:ScoreRing>
                                     </Grid>
 
-                                    <!-- Status pill -->
                                     <Border CornerRadius="10"
                                             Padding="7,2"
                                             HorizontalAlignment="Left"

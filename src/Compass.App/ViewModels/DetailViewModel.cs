@@ -8,13 +8,11 @@ using System.Globalization;
 
 namespace Compass.App.ViewModels;
 
-/// <summary>A grouping of feature items under a category label (e.g. Genres, Themes).</summary>
 public sealed record FeatureGroup(string Category, IReadOnlyList<string> Items);
 
 /// <summary>A "top factor" row: humanized feature name + bar fraction (0..1, relative to the strongest factor).</summary>
 public sealed record FeatureBar(string Name, double Fraction);
 
-/// <summary>A "more like this" entry: target appId + name + similarity percent.</summary>
 public sealed partial class SimilarRow : ObservableObject
 {
     public int AppId { get; }
@@ -32,7 +30,6 @@ public sealed partial class SimilarRow : ObservableObject
     }
 }
 
-/// <summary>ViewModel for the game detail slide-over panel.</summary>
 public sealed partial class DetailViewModel : ObservableObject, IDisposable
 {
     private readonly Game _game;
@@ -42,8 +39,6 @@ public sealed partial class DetailViewModel : ObservableObject, IDisposable
     private readonly Action _onChangedAndClose;
     private readonly Action _onLibraryChanged;
     private CancellationTokenSource _coverCts = new();
-
-    // ── Bound properties ──────────────────────────────────────────────────
 
     public string Name => _game.Name;
 
@@ -92,11 +87,7 @@ public sealed partial class DetailViewModel : ObservableObject, IDisposable
 
     public int ScorePercent => _rec is null ? 0 : (int)Math.Round(Math.Clamp(_rec.Score, 0, 1) * 100);
 
-    // ── Feature groups ────────────────────────────────────────────────────
-
     public IReadOnlyList<FeatureGroup> FeatureGroups { get; }
-
-    // ── Score breakdown (only when HasScore) ─────────────────────────────
 
     public IReadOnlyList<FeatureBar> TopFeatures
     {
@@ -112,8 +103,6 @@ public sealed partial class DetailViewModel : ObservableObject, IDisposable
     public IReadOnlyList<string> NearestLoved  => _rec?.WhyLikedNames       ?? [];
     public IReadOnlyList<string> PenalizedBy   => _rec?.WhyPenalizedNames   ?? [];
 
-    // ── More like this ────────────────────────────────────────────────────
-
     public IReadOnlyList<SimilarRow> Similar { get; private set; } = [];
     public bool HasSimilar => Similar.Count > 0;
 
@@ -126,12 +115,8 @@ public sealed partial class DetailViewModel : ObservableObject, IDisposable
         if (row is not null) GameChosen?.Invoke(row.AppId);
     }
 
-    // ── Not-interested toggle ─────────────────────────────────────────────
-
     [ObservableProperty]
     private bool isNotInterested;
-
-    // ── Feedback (more / less like this) ─────────────────────────────────
 
     [ObservableProperty]
     private int feedback;
@@ -170,8 +155,6 @@ public sealed partial class DetailViewModel : ObservableObject, IDisposable
         _onChangedAndClose();
     }
 
-    // ── Constructor ───────────────────────────────────────────────────────
-
     public DetailViewModel(
         Game game,
         GameRecommendation? rec,
@@ -200,8 +183,6 @@ public sealed partial class DetailViewModel : ObservableObject, IDisposable
             _ = LoadSimilarCoverAsync(row, _coverCts.Token);
     }
 
-    // ── Cover loading ─────────────────────────────────────────────────────
-
     public async Task LoadCoverAsync(CancellationToken ct)
     {
         // Do NOT ConfigureAwait(false) — must resume on UI thread so the property
@@ -214,15 +195,11 @@ public sealed partial class DetailViewModel : ObservableObject, IDisposable
         row.CoverPath = await _covers.GetCoverPathAsync(row.AppId, ct);
     }
 
-    // ── Dispose ───────────────────────────────────────────────────────────
-
     public void Dispose()
     {
         _coverCts.Cancel();
         _coverCts.Dispose();
     }
-
-    // ── Feature group builder ─────────────────────────────────────────────
 
     private static IReadOnlyList<FeatureGroup> BuildFeatureGroups(IReadOnlyList<string> featureKeys)
     {

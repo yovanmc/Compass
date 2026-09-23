@@ -49,12 +49,11 @@ smoke-launch verification (below) still applies for anything CI can't cover (ren
 
 ## Verification harness
 
-No dedicated `verify/` scripts or screenshot tooling in this repo. Verification uses a
-**smoke-launch** pattern instead of screenshots: launch with a fresh temp `--db`, confirm the
-process stays alive ≥5s with a non-zero `MainWindowHandle` and no XAML-parse crash, then kill
-it. An empty `--db` renders the app's empty-state (expected, not a bug) — populated-page checks
-require the owner to manually run Settings → Load sample data afterward; that step can't be
-automated headlessly.
+No `verify/` scripts or screenshot tooling. Verify with a **smoke launch**: start with a fresh
+temp `--db`, confirm the process stays alive ≥5s with a non-zero `MainWindowHandle` and no
+XAML-parse crash, then kill it. An empty `--db` renders the empty state (expected). Headless
+checks stop at process-alive + handle: populated pages need the owner to run Settings → Load
+sample data and look.
 
 ## Conventions & safety
 
@@ -69,8 +68,7 @@ automated headlessly.
   ...`, `fix(app): ...`, `docs: ...`).
 - **Keep `Compass.Recommender` pure.** No Steam/IGDB/DB/feedback/insights concepts may leak into
   it — new metrics/features orchestrate existing engine primitives from `Compass.Core` instead of
-  adding new ones to the engine itself. This is the one durable architectural constraint checked
-  in every plan.
+  adding new ones to the engine itself. This is the one durable architectural constraint.
 - Never commit secrets. Steam API key / IGDB Client ID+Secret go through `dotnet user-secrets`
   only; SteamID64 is non-secret and lives in `appsettings.json`.
 
@@ -83,7 +81,5 @@ automated headlessly.
   double-count with the existing implicit-negative (`NotInterested`) branch.
 - `Diversity = 0` must reproduce the pre-MMR ranking exactly — the diversity slider re-orders
   results only, it never changes the displayed match score.
-- Large-library performance (scrolling/recompute cost) is fragile. Watch
-  recompute cost when touching the Recommend/Library hot path.
-- Headless app testing is limited to process-alive + handle checks; there is no automated way to
-  verify rendered UI content without the owner eyeballing a populated run.
+- Large-library scrolling and recompute cost is fragile. Watch it on the Recommend/Library hot
+  path.

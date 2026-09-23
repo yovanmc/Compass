@@ -3,9 +3,6 @@ using FluentAssertions;
 
 public class RecommenderEvaluatorTests
 {
-    // ────────────────────────────────────────────────────────────────────────────
-    // IntraListDiversity
-    // ────────────────────────────────────────────────────────────────────────────
 
     [Fact]
     public void IntraListDiversity_TwoOrthogonalVectors_ReturnsOne()
@@ -62,10 +59,6 @@ public class RecommenderEvaluatorTests
             .Should().BeApproximately(2.0 / 3.0, 1e-9);
     }
 
-    // ────────────────────────────────────────────────────────────────────────────
-    // DistinctFeatureCoverage
-    // ────────────────────────────────────────────────────────────────────────────
-
     [Fact]
     public void DistinctFeatureCoverage_TwoDifferentSingleKeyVectors_ReturnsTwo()
     {
@@ -112,10 +105,6 @@ public class RecommenderEvaluatorTests
         evaluator.DistinctFeatureCoverage(vectors).Should().Be(3);
     }
 
-    // ────────────────────────────────────────────────────────────────────────────
-    // ScoreSpread
-    // ────────────────────────────────────────────────────────────────────────────
-
     [Fact]
     public void ScoreSpread_KnownList_ReturnsCorrectStats()
     {
@@ -153,10 +142,6 @@ public class RecommenderEvaluatorTests
         spread.Mean.Should().Be(0.0);
         spread.Stdev.Should().Be(0.0);
     }
-
-    // ────────────────────────────────────────────────────────────────────────────
-    // LeaveOneOutRecallAtK — isolated-candidate overload
-    // ────────────────────────────────────────────────────────────────────────────
 
     [Fact]
     public void LeaveOneOutRecallAtK_ObviousTwin_RecallIsGreaterThanZero()
@@ -214,10 +199,6 @@ public class RecommenderEvaluatorTests
         var evaluator = new RecommenderEvaluator();
         evaluator.LeaveOneOutRecallAtK(liked, k: 1, new RecommenderOptions()).Should().Be(0.0);
     }
-
-    // ────────────────────────────────────────────────────────────────────────────
-    // LeaveOneOutRecallAtK — shared-pool overload
-    // ────────────────────────────────────────────────────────────────────────────
 
     [Fact]
     public void LeaveOneOutRecallAtK_SharedPool_TwinInTopK_RecallIsGreaterThanZero()

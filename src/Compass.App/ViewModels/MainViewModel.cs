@@ -1,5 +1,4 @@
-// This file is kept for the shared row types used by XAML DataTemplates.
-// The logic previously in MainViewModel has been split into ShellViewModel + RecommendViewModel.
+// Shared row types used by XAML DataTemplates.
 using CommunityToolkit.Mvvm.ComponentModel;
 using Compass.Core.Model;
 using Compass.Core.Taste;
@@ -80,8 +79,6 @@ public sealed partial class GameRow : ObservableObject
         coverPath = coverPathValue;
     }
 
-    // ── Factories ──────────────────────────────────────────────────────────
-
     /// <summary>Full factory used by LibraryViewModel.</summary>
     public static GameRow From(Game g, double score, int playedFloorMinutes)
     {
@@ -102,10 +99,7 @@ public sealed partial class GameRow : ObservableObject
             coverPathValue: null);
     }
 
-    /// <summary>
-    /// Backward-compatible factory used by RecommendViewModel's Unmatched list
-    /// (only <see cref="Name"/> is bound in RecommendView.xaml).
-    /// </summary>
+    /// <summary>Unmatched-list factory for RecommendViewModel (only <see cref="Name"/> is bound).</summary>
     public static GameRow From(Game g) => From(g, score: 0, playedFloorMinutes: 120);
 }
 

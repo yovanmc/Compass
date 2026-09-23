@@ -12,28 +12,22 @@
                   HorizontalScrollBarVisibility="Disabled">
         <StackPanel Margin="0,0,0,24">
 
-            <!-- ═══ COVER ART ═════════════════════════════════════════════════ -->
-            <!-- #222 placeholder always underlies; image overlays when path is available -->
             <Border Height="360" Background="#222">
                 <Grid>
-                    <!-- Placeholder label: visible when no cover -->
                     <TextBlock Text="No cover"
                                Foreground="#5F5F5F" FontSize="12"
                                HorizontalAlignment="Center"
                                VerticalAlignment="Center"
                                Visibility="{Binding CoverPath, Converter={StaticResource NullToVis}, ConverterParameter=invert}"/>
 
-                    <!-- Cover image: visible when CoverPath is non-null -->
                     <Image Stretch="UniformToFill"
                            Visibility="{Binding CoverPath, Converter={StaticResource NullToVis}}"
                            Source="{Binding CoverPath, Converter={StaticResource PathToImageConverter}}"/>
                 </Grid>
             </Border>
 
-            <!-- ═══ METADATA ══════════════════════════════════════════════════ -->
             <StackPanel Margin="16,14,16,0">
 
-                <!-- Game name -->
                 <TextBlock Text="{Binding Name, Mode=OneWay}"
                            Foreground="#EAEAEA"
                            FontSize="18" FontWeight="Bold"
@@ -41,10 +35,8 @@
                            LineHeight="24"
                            Margin="0,0,0,6"/>
 
-                <!-- Status pill + playtime row -->
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
 
-                    <!-- Status pill -->
                     <Border CornerRadius="10" Padding="8,3" Margin="0,0,8,0">
                         <Border.Style>
                             <Style TargetType="Border">
@@ -88,14 +80,12 @@
                         </TextBlock>
                     </Border>
 
-                    <!-- Playtime (forever) -->
                     <TextBlock Text="{Binding PlaytimeForeverDisplay, Mode=OneWay}"
                                Foreground="#8A8A8A" FontSize="12"
                                VerticalAlignment="Center"/>
 
                 </StackPanel>
 
-                <!-- Playtime (recent) — only if non-empty -->
                 <TextBlock Foreground="#5F5F5F" FontSize="11" Margin="0,0,0,6"
                            Text="{Binding Playtime2WeeksDisplay, Mode=OneWay}">
                     <TextBlock.Style>
@@ -110,16 +100,13 @@
                     </TextBlock.Style>
                 </TextBlock>
 
-                <!-- Match label -->
                 <TextBlock Text="{Binding MatchLabel, Mode=OneWay}"
                            Foreground="#5F5F5F" FontSize="11" FontStyle="Italic"
                            Margin="0,0,0,14"/>
 
-                <!-- ── Score section (only when HasScore) ─────────────────── -->
                 <StackPanel Margin="0,0,0,14"
                             Visibility="{Binding HasScore, Converter={StaticResource BoolToVis}}">
 
-                    <!-- Score % -->
                     <StackPanel Orientation="Horizontal" Margin="0,0,0,10">
                         <TextBlock Text="{Binding ScorePercent, Mode=OneWay}"
                                    Foreground="#EBB740" FontSize="28" FontWeight="Bold"/>
@@ -130,11 +117,9 @@
                                    VerticalAlignment="Bottom" Margin="8,0,0,5"/>
                     </StackPanel>
 
-                    <!-- Top factors label -->
                     <TextBlock Text="Top factors"
                                Foreground="#8A8A8A" FontSize="11" FontWeight="SemiBold"
                                Margin="0,0,0,6"/>
-                    <!-- TopFeatures bars (rank-ordered by contribution, width ∝ magnitude) -->
                     <ItemsControl ItemsSource="{Binding TopFeatures, Mode=OneWay}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -143,7 +128,6 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <!-- Feature name -->
                                     <TextBlock Grid.Column="0"
                                                Text="{Binding Name, Mode=OneWay}"
                                                Foreground="#4FC3F7" FontSize="11"
@@ -163,7 +147,6 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <!-- Because you played -->
                     <StackPanel Margin="0,8,0,0">
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
@@ -195,11 +178,9 @@
                         </ItemsControl>
                     </StackPanel>
 
-                    <!-- Held back by (only if non-empty) -->
                     <StackPanel Margin="0,8,0,0">
                         <StackPanel.Style>
                             <Style TargetType="StackPanel">
-                                <!-- Default visible; collapsed when count is 0 -->
                                 <Setter Property="Visibility" Value="Visible"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding PenalizedBy.Count}" Value="0">
@@ -230,10 +211,8 @@
 
                 </StackPanel>
 
-                <!-- ── SEPARATOR ────────────────────────────────────────────── -->
                 <Border Height="1" Background="#222" Margin="0,0,0,14"/>
 
-                <!-- ── FEATURE GROUPS ──────────────────────────────────────── -->
                 <ItemsControl ItemsSource="{Binding FeatureGroups, Mode=OneWay}" Margin="0,0,0,6">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="{x:Type vm:FeatureGroup}">
@@ -262,13 +241,10 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- ── SEPARATOR ────────────────────────────────────────────── -->
                 <Border Height="1" Background="#222" Margin="0,4,0,14"/>
 
-                <!-- ── FEEDBACK toggles (More / Less like this) ──────────── -->
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
 
-                    <!-- More like this -->
                     <Button Command="{Binding MoreLikeThisCommand}"
                             Cursor="Hand"
                             Padding="12,7"
@@ -311,7 +287,6 @@
                         <TextBlock Text="More like this"/>
                     </Button>
 
-                    <!-- Less like this -->
                     <Button Command="{Binding LessLikeThisCommand}"
                             Cursor="Hand"
                             Padding="12,7"
@@ -355,7 +330,6 @@
 
                 </StackPanel>
 
-                <!-- ── NOT INTERESTED toggle ──────────────────────────────── -->
                 <Button Command="{Binding ToggleNotInterestedCommand}"
                         Cursor="Hand"
                         Padding="12,7"
@@ -408,7 +382,6 @@
                     </TextBlock>
                 </Button>
 
-                <!-- ── MORE LIKE THIS (only when HasSimilar) ──────────────── -->
                 <StackPanel Margin="0,14,0,0"
                             Visibility="{Binding HasSimilar, Converter={StaticResource BoolToVis}}">
                     <Border Height="1" Background="#222" Margin="0,0,0,14"/>
@@ -427,7 +400,6 @@
                                         Cursor="Hand"
                                         MouseLeftButtonUp="Similar_Click">
                                     <StackPanel>
-                                        <!-- cover thumb: #222 placeholder under image, image shown when CoverPath is non-null -->
                                         <Border Height="56" Background="#222" CornerRadius="4" Margin="0,0,0,6">
                                             <Grid>
                                                 <TextBlock Text="No cover"

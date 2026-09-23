@@ -30,9 +30,8 @@ public sealed partial class ShellViewModel : ObservableObject
     partial void OnActiveDetailChanged(DetailViewModel? value)
         => OnPropertyChanged(nameof(IsDetailOpen));
 
-    // Detach the replaced panel's re-open handler so its event lifecycle is
-    // symmetric with the subscribe in OnGameChosen (no dangling subscriptions).
-    // Also dispose the CTS to cancel any in-flight cover loads.
+    // Unsubscribe the replaced panel's re-open handler (mirrors the subscribe in OnGameChosen)
+    // and dispose it to cancel in-flight cover loads.
     partial void OnActiveDetailChanging(DetailViewModel? oldValue, DetailViewModel? newValue)
     {
         if (oldValue is not null) oldValue.GameChosen -= OnGameChosen;
@@ -60,7 +59,6 @@ public sealed partial class ShellViewModel : ObservableObject
         Settings       = settings;
         MissingSecrets = SecretsGuard.FindMissing(opts);
 
-        // Subscribe to game-chosen events from both pages
         Recommend.GameChosen += OnGameChosen;
         Library.GameChosen   += OnGameChosen;
 
@@ -124,7 +122,6 @@ public sealed partial class ShellViewModel : ObservableObject
             var report = await Task.Run(() => _sync.SyncAsync(CancellationToken.None, progress));
             StatusText = $"{report.Owned} games · {report.Matched} matched · {report.Unmatched} unmatched";
 
-            // Refresh all page VMs after sync
             Recommend.RefreshFromStore();
             Library.RefreshFromStore();
             _insights.RefreshFromStore();

@@ -39,10 +39,8 @@ public class WhyFeatureTests
         var top = result.Recommendations.First();
         top.Game.Name.Should().Be("More RPG");
 
-        // WhyFeatures must be the new typed list
         top.WhyFeatures.Should().NotBeEmpty();
 
-        // Each entry must have a humanized Name (no "genre:" prefix) and a positive Contribution
         top.WhyFeatures.Should().AllSatisfy(wf =>
         {
             wf.Name.Should().NotContain(":");

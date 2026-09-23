@@ -14,18 +14,15 @@
         ExtendsContentIntoTitleBar="True"
         d:DataContext="{d:DesignInstance vm:ShellViewModel}">
 
-    <!-- Root grid: the existing 2-row shell + the detail overlay as siblings -->
     <Grid>
 
-        <!-- ═══ EXISTING SHELL (TitleBar + NavigationView — UNCHANGED) ══════ -->
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>   <!-- Title bar (persistent top bar: Sync + status) -->
                 <RowDefinition Height="*"/>      <!-- NavigationView shell -->
             </Grid.RowDefinitions>
 
-            <!-- ═══ TITLE BAR (persistent top bar across all pages) ═══════════ -->
-            <!-- NOTE: ui:TitleBar must be a sibling of NavigationView, NOT inside
+            <!-- ui:TitleBar must be a sibling of NavigationView, NOT inside
                  ui:NavigationView.TitleBar — the LeftFluent NavigationView template
                  does not render its TitleBar property, so anything placed there is
                  silently invisible. The standalone TitleBar template renders
@@ -67,7 +64,6 @@
                 </ui:TitleBar.TrailingContent>
             </ui:TitleBar>
 
-            <!-- ═══ NAVIGATION SHELL ═════════════════════════════════════════ -->
             <ui:NavigationView x:Name="NavView"
                                Grid.Row="1"
                                PaneDisplayMode="LeftFluent"
@@ -78,7 +74,6 @@
                                Background="#0A0A0A"
                                Foreground="#EAEAEA">
 
-                <!-- ═══ NAV ITEMS ════════════════════════════════════════════ -->
                 <ui:NavigationView.MenuItems>
                     <ui:NavigationViewItem Content="Recommend"
                                            TargetPageType="{x:Type views:RecommendView}">
@@ -100,7 +95,6 @@
                     </ui:NavigationViewItem>
                 </ui:NavigationView.MenuItems>
 
-                <!-- ═══ FOOTER NAV ITEM ══════════════════════════════════════ -->
                 <ui:NavigationView.FooterMenuItems>
                     <ui:NavigationViewItem Content="Settings"
                                            TargetPageType="{x:Type views:SettingsView}">
@@ -110,7 +104,6 @@
                     </ui:NavigationViewItem>
                 </ui:NavigationView.FooterMenuItems>
 
-                <!-- ═══ HEADER CONTENT (missing-keys banner, persistent) ═════ -->
                 <ui:NavigationView.Header>
                     <Border Margin="16,6,16,0"
                             Padding="14,10"
@@ -140,13 +133,10 @@
             </ui:NavigationView>
         </Grid>
 
-        <!-- ═══ DETAIL OVERLAY (sits on top of everything when IsDetailOpen) ══ -->
         <Grid Visibility="{Binding IsDetailOpen, Converter={StaticResource BoolToVis}}">
 
-            <!-- Scrim: semi-transparent backdrop; click closes the panel -->
             <Rectangle Fill="#A6000000" MouseLeftButtonUp="Scrim_Click"/>
 
-            <!-- Slide-over panel: right-anchored, 430px wide -->
             <Border x:Name="DetailPanel"
                     HorizontalAlignment="Right"
                     Width="430"
@@ -157,7 +147,6 @@
                     <TranslateTransform x:Name="DetailPanelTranslate" X="0"/>
                 </Border.RenderTransform>
                 <Border.Triggers>
-                    <!-- Slide in from right when the overlay becomes visible -->
                     <EventTrigger RoutedEvent="Border.Loaded">
                         <BeginStoryboard>
                             <Storyboard>

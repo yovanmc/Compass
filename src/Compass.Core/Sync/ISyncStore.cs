@@ -17,8 +17,7 @@ public interface ISyncStore
     /// <summary>
     /// Loads the baked-in sample library into the store.
     /// Implementations that back a real database should write all four
-    /// owned-data tables. The in-memory test fake only needs enough fidelity
-    /// to keep existing tests green.
+    /// owned-data tables. The in-memory test fake may be partial.
     /// </summary>
     void LoadSampleData(IReadOnlyList<SampleGame> games);
 

@@ -28,9 +28,8 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // Apply dark theme + ice-cyan accent BEFORE first window renders (Mica OFF = None backdrop).
+        // Must run before the first window renders. Mica off = None backdrop.
         ApplicationThemeManager.Apply(ApplicationTheme.Dark, WindowBackdropType.None, false);
-        // Ice-cyan #4FC3F7 as accent.
         var iceCyan = Color.FromRgb(0x4F, 0xC3, 0xF7);
         ApplicationAccentColorManager.Apply(iceCyan, ApplicationTheme.Dark, false, false);
 
@@ -77,7 +76,6 @@ public partial class App : Application
 
         sc.AddSingleton<ISyncStore>(sp => new SqliteSyncStore(sp.GetRequiredService<CompassDb>()));
 
-        // Settings persistence infrastructure
         sc.AddSingleton<ISettingsStore>(sp => new SettingsRepository(sp.GetRequiredService<CompassDb>()));
         sc.AddSingleton(sp => new RecommenderSettingsService(sp.GetRequiredService<ISettingsStore>()));
         sc.AddSingleton(sp => new RecommenderConfigState(
@@ -92,7 +90,6 @@ public partial class App : Application
         sc.AddSingleton(new RecommendationService());
         sc.AddSingleton(new InsightsService());
 
-        // Cover art infrastructure
         sc.AddSingleton<ICoverDownloader>(sp =>
             new HttpCoverDownloader(sp.GetRequiredService<IHttpClientFactory>().CreateClient()));
         sc.AddSingleton<ICoverProvider>(sp =>
@@ -113,7 +110,6 @@ public partial class App : Application
         sc.AddTransient<SettingsView>();
         sc.AddTransient<InsightsView>();
 
-        // Navigation page provider (feeds DI instances to WPF-UI NavigationView)
         sc.AddSingleton<PageProvider>(sp => new PageProvider(sp));
 
         sc.AddSingleton<MainWindow>();
