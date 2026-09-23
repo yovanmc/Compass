@@ -8,7 +8,6 @@ namespace Compass.App.ViewModels;
 public sealed partial class ShellViewModel : ObservableObject
 {
     private readonly SyncService _sync;
-    private readonly CompassOptions _opts;
     private readonly DetailViewModelFactory _detailFactory;
     private readonly InsightsViewModel _insights;
 
@@ -51,7 +50,6 @@ public sealed partial class ShellViewModel : ObservableObject
         DetailViewModelFactory detailFactory)
     {
         _sync          = sync;
-        _opts          = opts;
         _detailFactory = detailFactory;
         _insights      = insights;
         Recommend      = recommend;
