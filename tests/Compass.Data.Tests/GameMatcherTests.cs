@@ -64,12 +64,9 @@ public class GameMatcherTests
         // IGDB external_games can return multiple rows for the same appid (e.g. regional entries).
         // GameMatcher must handle this without throwing a duplicate-key exception.
         var fake = new FakeIgdb();
-        // Inject two IgdbMatch rows for the same Steam appId 10
-        // We override MatchBySteamAppIdsAsync to return duplicates
         var fakeWithDups = new DupFakeIgdb();
         var matcher = new GameMatcher(fakeWithDups, nameConfidenceThreshold: 0.85);
         var results = await matcher.MatchAsync(new[] { (10, "Doom") }, default);
-        // Should not throw, should yield exactly one appid match
         results.Should().HaveCount(1);
         results.Single().IgdbId.Should().NotBeNull();
         results.Single().Method.Should().Be("appid");

@@ -5,7 +5,6 @@ using Compass.Core.Taste;
 
 namespace Compass.App.ViewModels;
 
-/// <summary>A single bar-chart row: label, normalised fraction [0..1], and display value text.</summary>
 public sealed record BarRow(string Label, double Fraction, string Value);
 
 public sealed partial class InsightsViewModel : ObservableObject
@@ -106,7 +105,6 @@ public sealed partial class InsightsViewModel : ObservableObject
 
         try
         {
-            // The expensive part (AnalyzeTaste + ComputeHealth) runs off the UI thread.
             var (taste, health) = await Task.Run(
                 () => (_insights.AnalyzeTaste(lib, cfg), _insights.ComputeHealth(lib, cfg)),
                 cts.Token);

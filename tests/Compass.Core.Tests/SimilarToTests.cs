@@ -3,9 +3,6 @@ using Compass.Core.Taste;
 using FluentAssertions;
 using Xunit;
 
-/// <summary>
-/// Tests for RecommendationService.SimilarTo: per-game nearest-neighbour lookup.
-/// </summary>
 public class SimilarToTests
 {
     // Helpers — IgdbId non-null so the game is matched and gets a vector.
@@ -31,13 +28,10 @@ public class SimilarToTests
 
         var results = Svc.SimilarTo(library, seedAppId: 1, k: 3);
 
-        // Seed must not appear in results
         results.Select(r => r.Game.SteamAppId).Should().NotContain(1);
 
-        // Most-similar (full feature overlap) should rank first
         results.First().Game.SteamAppId.Should().Be(2);
 
-        // Scores must be descending
         results.Select(r => r.Score).Should().BeInDescendingOrder();
     }
 
@@ -57,13 +51,10 @@ public class SimilarToTests
 
         var results = Svc.SimilarTo(library, seedAppId: 1, k: 5);
 
-        // Hidden game must never appear
         results.Select(r => r.Game.SteamAppId).Should().NotContain(2);
 
-        // Seed must not appear
         results.Select(r => r.Game.SteamAppId).Should().NotContain(1);
 
-        // Game 3 shares both features with seed; it should rank in results
         results.Should().Contain(r => r.Game.SteamAppId == 3);
     }
 

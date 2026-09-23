@@ -31,9 +31,8 @@ public sealed class CompassDb
         using var conn = OpenConnection();
         using var tx = conn.BeginTransaction();
 
-        // Execute each CREATE TABLE / CREATE INDEX statement individually
-        // because Microsoft.Data.Sqlite may not support all multi-statement batches
-        // when a transaction is involved. Split on ';' and run each non-empty statement.
+        // Run statements one at a time: Microsoft.Data.Sqlite may not run every
+        // multi-statement batch inside a transaction.
         foreach (var stmt in SplitStatements(Schema.Sql))
         {
             using var cmd = conn.CreateCommand();

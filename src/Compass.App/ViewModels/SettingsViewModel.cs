@@ -15,11 +15,9 @@ public sealed partial class SettingsViewModel : ObservableObject
     // Guard: prevents OnXxxChanged hooks from firing Save/re-rank during ctor population.
     private bool _loading = true;
 
-    // ── Scorer mode list (static) ─────────────────────────────────────────
     public IReadOnlyList<string> ScorerModes { get; } =
         new[] { "NearestNeighbor", "Centroid", "Hybrid" };
 
-    // ── Bound knobs ───────────────────────────────────────────────────────
     [ObservableProperty]
     private int playedFloorMinutes;
 
@@ -59,21 +57,18 @@ public sealed partial class SettingsViewModel : ObservableObject
     // Derived — raised explicitly in OnSelectedScorerModeChanged.
     public bool IsHybrid => SelectedScorerMode == "Hybrid";
 
-    // ── Confirm delegate (wired by code-behind to MessageBox) ─────────────
     /// <summary>
     /// Called before any destructive data operation. Return true to proceed.
     /// If null, the operation is aborted (fail-safe: no accidental data loss).
     /// </summary>
     public Func<string, bool>? Confirm { get; set; }
 
-    // ── Events ────────────────────────────────────────────────────────────
     /// <summary>Raised after every knob change and after Reset. Shell subscribes to re-rank Recommend + Library.</summary>
     public event Action? ConfigChanged;
 
     /// <summary>Raised after LoadSampleData or ClearLibrary completes. Shell subscribes to refresh all pages.</summary>
     public event Action? LibraryReplaced;
 
-    // ── Constructor ───────────────────────────────────────────────────────
     public SettingsViewModel(
         RecommenderSettingsService settingsSvc,
         RecommenderConfigState state,
@@ -92,7 +87,6 @@ public sealed partial class SettingsViewModel : ObservableObject
         _loading = false;
     }
 
-    // ── Property-changed hooks (generated code calls these) ───────────────
     partial void OnPlayedFloorMinutesChanged(int value)   => ApplyAndPersist();
     partial void OnKChanged(int value)                     => ApplyAndPersist();
     partial void OnHybridAlphaChanged(double value)        => ApplyAndPersist();
@@ -111,7 +105,6 @@ public sealed partial class SettingsViewModel : ObservableObject
         ApplyAndPersist();
     }
 
-    // ── Reset command ─────────────────────────────────────────────────────
     [RelayCommand]
     private void Reset()
     {
@@ -125,7 +118,6 @@ public sealed partial class SettingsViewModel : ObservableObject
         ConfigChanged?.Invoke();
     }
 
-    // ── Data commands ─────────────────────────────────────────────────────
     [RelayCommand]
     private void LoadSampleData()
     {
@@ -137,11 +129,8 @@ public sealed partial class SettingsViewModel : ObservableObject
                 return;
         }
 
-        // Replace, don't merge: clear first so the sample becomes the entire
-        // library — matches the confirm text and the "overwrite a non-empty
-        // library" design decision. The provider upserts (it never clears), so
-        // without this a real synced library would be merged with, not replaced.
-        // Clearing is a harmless no-op when the library is already empty.
+        // Replace, don't merge: the provider only upserts, so without this clear a synced
+        // library would be merged with the sample. The confirm text promises a replace.
         _store.ClearLibrary();
         _store.LoadSampleData(SampleLibrary.Load());
         LibraryReplaced?.Invoke();
@@ -162,7 +151,6 @@ public sealed partial class SettingsViewModel : ObservableObject
         LibraryReplaced?.Invoke();
     }
 
-    // ── Private helpers ───────────────────────────────────────────────────
     private void PopulateFromConfig(RecommenderConfig cfg)
     {
         PlayedFloorMinutes   = cfg.PlayedFloorMinutes;

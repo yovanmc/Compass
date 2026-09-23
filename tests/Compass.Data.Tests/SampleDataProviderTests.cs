@@ -28,8 +28,6 @@ public class SampleDataProviderTests : IDisposable
         if (File.Exists(_path + "-shm")) File.Delete(_path + "-shm");
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
-
     private static IReadOnlyList<SampleGame> MinimalSample() => new[]
     {
         // Matched game with features
@@ -41,8 +39,6 @@ public class SampleDataProviderTests : IDisposable
         // Unmatched — no igdbName, no features
         new SampleGame(102, "Mystery Game", 0, 0, null, Array.Empty<string>()),
     };
-
-    // ── Tests ─────────────────────────────────────────────────────────────────
 
     [Fact]
     public void Load_InsertsAllGamesRows()
@@ -120,12 +116,10 @@ public class SampleDataProviderTests : IDisposable
         var provider = new SampleDataProvider(_db);
         provider.Load(MinimalSample());
 
-        // Sanity: something was loaded.
         _repo.LoadLibrary().Should().NotBeEmpty();
 
         _repo.ClearLibrary();
 
-        // All four owned-data tables must be empty.
         _repo.LoadLibrary().Should().BeEmpty("games table must be cleared");
         CountRows("igdb_games").Should().Be(0, "igdb_games must be cleared");
         CountRows("features").Should().Be(0, "features must be cleared");
@@ -141,7 +135,6 @@ public class SampleDataProviderTests : IDisposable
         provider.Load(MinimalSample());
         _repo.ClearLibrary();
 
-        // Settings row must survive.
         CountRows("settings").Should().Be(1, "settings table must not be cleared");
         ReadSetting("keep_me").Should().Be("yes");
     }
@@ -161,8 +154,6 @@ public class SampleDataProviderTests : IDisposable
         store.ClearLibrary();
         store.LoadLibrary().Should().BeEmpty();
     }
-
-    // ── DB helpers ────────────────────────────────────────────────────────────
 
     private void InsertSetting(string key, string value)
     {

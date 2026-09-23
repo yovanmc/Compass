@@ -14,7 +14,7 @@ public class MmrDiversityTests
 
     /// <summary>
     /// With Diversity=0 the returned order must equal pure-relevance descending order.
-    /// Back-compat guarantee: δ=0 skips MMR entirely.
+    /// δ=0 skips MMR entirely.
     /// </summary>
     [Fact]
     public void DiversityZero_ReproducesPureRelevanceOrder()
@@ -41,12 +41,10 @@ public class MmrDiversityTests
             CategoryWeights = new Dictionary<string, double> { ["genre"] = 1.0 }
         });
 
-        // Order must match the pure-relevance (no-Diversity) ordering.
         var idsWithZero = withDiversityZero.Recommendations.Select(r => r.ItemId).ToList();
         var idsDefault  = withDiversityNone.Recommendations.Select(r => r.ItemId).ToList();
         idsWithZero.Should().Equal(idsDefault);
 
-        // Sanity: scores are in descending order.
         var scores = withDiversityZero.Recommendations.Select(r => r.Score).ToList();
         scores.Should().BeInDescendingOrder();
     }

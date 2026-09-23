@@ -79,13 +79,10 @@ public class SampleLibraryTests
         liked.Should().NotBeEmpty("played games with features should appear in liked");
         backlog.Should().NotBeEmpty("backlog candidates with features should be present");
 
-        // All liked items must have non-empty feature vectors
         liked.Should().AllSatisfy(p => p.Features.IsEmpty.Should().BeFalse());
 
-        // All backlog items must have non-empty feature vectors
         backlog.Should().AllSatisfy(c => c.Features.IsEmpty.Should().BeFalse());
 
-        // Affinities must be positive for all liked items
         liked.Should().AllSatisfy(p => p.Affinity.Should().BeGreaterThan(0.0));
     }
 

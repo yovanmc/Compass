@@ -18,9 +18,7 @@ public static partial class NameNormalizer
         // Strip edition suffixes that appear after a dash, colon, parenthesis, or trailing
         foreach (var suf in EditionSuffixes)
             s = Regex.Replace(s, $@"[\-\(\:]?\s*{Regex.Escape(suf)}\s*\)?", " ");
-        // Drop remaining punctuation (non-alphanumeric, non-space)
         s = NonAlphaNum().Replace(s, " ");
-        // Collapse whitespace
         s = WhitespaceRun().Replace(s, " ").Trim();
         // Strip leading articles (helps match "The Witcher" → "witcher")
         s = LeadingArticle().Replace(s, "");

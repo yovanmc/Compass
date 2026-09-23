@@ -33,7 +33,6 @@ public sealed class SampleDataProvider
 
         foreach (var g in games)
         {
-            // 1. Upsert games row (owned info only; do NOT clobber igdb_id on conflict).
             UpsertGame(conn, tx, g);
 
             bool isMatched = g.IgdbName is not null && g.FeatureKeys.Count > 0;
@@ -43,13 +42,10 @@ public sealed class SampleDataProvider
             // Synthesized igdb_id: stable, collision-free with real IGDB ids.
             long igdbId = 1_000_000L + g.AppId;
 
-            // 2. Set match columns on the games row.
             SetMatch(conn, tx, g.AppId, igdbId);
 
-            // 3. Upsert igdb_games row.
             UpsertIgdbGame(conn, tx, igdbId, g.IgdbName!);
 
-            // 4. Upsert each feature into the vocab table + link game_features.
             foreach (var key in g.FeatureKeys)
             {
                 var (category, humanName) = ParseFeatureKey(key);
@@ -60,8 +56,6 @@ public sealed class SampleDataProvider
 
         tx.Commit();
     }
-
-    // ── Private helpers ───────────────────────────────────────────────────────
 
     private static void UpsertGame(SqliteConnection conn, SqliteTransaction tx, SampleGame g)
     {

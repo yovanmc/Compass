@@ -42,7 +42,6 @@ public sealed class IgdbClient : IIgdbClient
                 using var resp = await _http.SendAsync(req, ct);
                 if ((int)resp.StatusCode == 429 && attempt < 5)
                 {
-                    // Exponential-ish backoff on rate-limit
                     await Task.Delay(TimeSpan.FromMilliseconds(250 * (attempt + 1)), ct);
                     continue;
                 }
@@ -61,7 +60,6 @@ public sealed class IgdbClient : IIgdbClient
         foreach (var chunk in Chunk(appIds, 200))
         {
             var uids = string.Join(',', chunk.Select(a => $"\"{a}\""));
-            // Query external_games: uid is the Steam appId string, category=SteamExternalCategory.
             // Request game as an object with id+name so we get both in one call.
             var body =
                 $"fields uid, game, game.name; where category = {SteamExternalCategory} & uid = ({uids}); limit 500;";
@@ -87,7 +85,7 @@ public sealed class IgdbClient : IIgdbClient
                     // game is a bare id (shouldn't happen when fields includes game.name, but guard it)
                     igdbId = gameEl.GetInt64();
                 }
-                else continue; // unexpected shape
+                else continue;
 
                 matches.Add(new IgdbMatch(appId, igdbId, name));
             }
@@ -98,7 +96,6 @@ public sealed class IgdbClient : IIgdbClient
     public async Task<IReadOnlyList<(long igdbId, string name)>> SearchByNameAsync(
         string name, CancellationToken ct)
     {
-        // Sanitize the name for the Apicalypse search string
         var safe = name.Replace("\"", " ");
         var body = $"search \"{safe}\"; fields id, name; limit 10;";
         using var doc = await QueryAsync("games", body, ct);

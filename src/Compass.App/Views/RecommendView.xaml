@@ -16,13 +16,11 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- ═══ SECTION HEADER ═══════════════════════════════════════════ -->
         <Border Grid.Row="0" Padding="16,10,16,0">
             <TextBlock Text="Recommended from your backlog"
                        Foreground="#EAEAEA" FontSize="14" FontWeight="SemiBold"/>
         </Border>
 
-        <!-- ═══ MAIN CONTENT ════════════════════════════════════════════ -->
         <!-- Empty-state onboarding overlay (no games in library yet) -->
         <StackPanel Grid.Row="1"
                     VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="380"
@@ -37,7 +35,6 @@
                       Background="#0A0A0A" Padding="16,6,16,0">
             <StackPanel>
 
-                <!-- Recommendations card grid -->
                 <ItemsControl ItemsSource="{Binding Recommendations, Mode=OneWay}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
@@ -87,7 +84,6 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
-                <!-- Unmatched section -->
                 <Expander IsExpanded="False" Margin="0,16,0,8"
                           Background="Transparent" BorderThickness="0">
                     <Expander.Header>
@@ -111,7 +107,6 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- ═══ FOOTER ═══════════════════════════════════════════════════ -->
         <Border Grid.Row="2" Background="#0D0D0D" BorderBrush="#222" BorderThickness="0,1,0,0"
                 Padding="16,6">
             <TextBlock Foreground="#5F5F5F" FontSize="11">

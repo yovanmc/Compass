@@ -2,9 +2,6 @@ using Wpf.Ui.Abstractions;
 
 namespace Compass.App.Navigation;
 
-/// <summary>
-/// Resolves navigation pages from the DI container for WPF-UI NavigationView.
-/// </summary>
 public sealed class PageProvider : INavigationViewPageProvider
 {
     private readonly IServiceProvider _services;

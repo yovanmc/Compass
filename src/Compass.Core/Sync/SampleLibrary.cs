@@ -6,9 +6,6 @@ using Compass.Recommender;
 
 namespace Compass.Core.Sync;
 
-/// <summary>
-/// Represents one game entry in the baked-in sample library.
-/// </summary>
 public sealed record SampleGame(
     int AppId,
     string Name,
@@ -25,13 +22,9 @@ public static class SampleLibrary
     private static readonly JsonSerializerOptions _jsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        // Ensure nullable string properties deserialize correctly
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
     };
 
-    /// <summary>
-    /// Deserializes the embedded sample-library.json and returns all sample games.
-    /// </summary>
     public static IReadOnlyList<SampleGame> Load()
     {
         var asm = Assembly.GetExecutingAssembly();

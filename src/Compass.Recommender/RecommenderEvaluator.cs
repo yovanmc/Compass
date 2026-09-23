@@ -6,7 +6,6 @@ namespace Compass.Recommender;
 /// </summary>
 public sealed class RecommenderEvaluator
 {
-    // ── IntraListDiversity ───────────────────────────────────────────────────
 
     /// <summary>
     /// Average pairwise (1 − cosine) over the plain L2-normalized feature vectors.
@@ -18,7 +17,6 @@ public sealed class RecommenderEvaluator
         if (vectors.Count < 2)
             return 0.0;
 
-        // L2-normalize each vector once over its raw Weights.
         var normed = new Dictionary<string, double>[vectors.Count];
         for (int i = 0; i < vectors.Count; i++)
             normed[i] = PlainL2Normalize(vectors[i].Weights);
@@ -39,8 +37,6 @@ public sealed class RecommenderEvaluator
         return pairs == 0 ? 0.0 : totalDiversity / pairs;
     }
 
-    // ── DistinctFeatureCoverage ──────────────────────────────────────────────
-
     /// <summary>
     /// Count of distinct feature-dimension keys with non-zero weight across all vectors.
     /// </summary>
@@ -52,8 +48,6 @@ public sealed class RecommenderEvaluator
                 if (w != 0.0) keys.Add(k);
         return keys.Count;
     }
-
-    // ── ScoreSpread ──────────────────────────────────────────────────────────
 
     /// <summary>
     /// Population statistics (min, max, mean, stdev) over a list of scores.
@@ -92,8 +86,6 @@ public sealed class RecommenderEvaluator
         return (min, max, mean, stdev);
     }
 
-    // ── LeaveOneOutRecallAtK — isolated-candidate overload ───────────────────
-
     /// <summary>
     /// For each liked item with a non-empty vector, hold it out, present it as the
     /// sole candidate, and check whether it appears in the top-k returned ranking.
@@ -104,8 +96,6 @@ public sealed class RecommenderEvaluator
         int k,
         RecommenderOptions options)
         => LeaveOneOutRecallAtK(liked, Array.Empty<CandidateItem>(), k, options);
-
-    // ── LeaveOneOutRecallAtK — shared-pool overload ──────────────────────────
 
     /// <summary>
     /// Same as the isolated overload but the held-out item competes against
@@ -132,12 +122,10 @@ public sealed class RecommenderEvaluator
             if (heldOut.Features.IsEmpty)
                 continue;
 
-            // Build liked' = all liked items except the held-out one.
             var likedPrime = new List<ProfileItem>(liked.Count - 1);
             for (int j = 0; j < liked.Count; j++)
                 if (j != i) likedPrime.Add(liked[j]);
 
-            // candidates = sharedPool ∪ { heldOut as a CandidateItem }
             var candidates = new List<CandidateItem>(sharedPool.Count + 1);
             candidates.AddRange(sharedPool);
             candidates.Add(new CandidateItem(heldOut.ItemId, heldOut.Features));
@@ -158,8 +146,6 @@ public sealed class RecommenderEvaluator
 
         return evaluated == 0 ? 0.0 : (double)hits / evaluated;
     }
-
-    // ── Private helpers ──────────────────────────────────────────────────────
 
     /// <summary>
     /// L2-normalizes raw feature weights, independent of the engine's IDF model.

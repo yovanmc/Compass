@@ -31,7 +31,6 @@ public sealed class ContentRecommender : IRecommender
         if (likedVecs.Count == 0)
             return new RankedResult(Array.Empty<Recommendation>());
 
-        // Pre-weight disliked vectors.
         var dislikedVecs = new List<(string id, double affinity, Dictionary<string, double> vec)>();
         foreach (var d in disliked)
         {
@@ -59,7 +58,7 @@ public sealed class ContentRecommender : IRecommender
                 continue;
             }
 
-            // Positive kNN (affinity-weighted, preserves v1 numbers exactly).
+            // Positive kNN (affinity-weighted).
             var (knn, neighbors) = AffinityKnn(cv, likedVecs, options.K, options.MaxExplanationNeighbors);
 
             double centroidSim = VectorMath.Dot(cv, centroid);
@@ -93,10 +92,9 @@ public sealed class ContentRecommender : IRecommender
             scored.Add((new Recommendation(c.ItemId, finalScore, contributions, neighbors, penalizedBy), cv));
         }
 
-        // Sort by descending relevance score (pure-relevance order).
         scored.Sort((a, b) => b.rec.Score.CompareTo(a.rec.Score));
 
-        // MMR re-rank: if δ=0 skip entirely (exact back-compat).
+        // δ=0 must reproduce the pure-relevance order exactly.
         if (options.Diversity <= 0)
             return new RankedResult(scored.Select(s => s.rec).ToList());
 

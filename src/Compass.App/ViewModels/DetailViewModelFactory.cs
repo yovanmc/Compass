@@ -6,7 +6,6 @@ using Compass.Core.Taste;
 namespace Compass.App.ViewModels;
 
 /// <summary>
-/// Creates a <see cref="DetailViewModel"/> for a specific game.
 /// Runs a fresh recommendation pass so the detail panel always reflects current store state.
 /// </summary>
 public sealed class DetailViewModelFactory

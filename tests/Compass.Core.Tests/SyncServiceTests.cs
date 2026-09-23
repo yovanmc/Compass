@@ -3,8 +3,6 @@ using Compass.Core.Sync;
 using FluentAssertions;
 using Xunit;
 
-// ── Fakes ──────────────────────────────────────────────────────────────────
-
 sealed class FakeSteam : ISteamClient
 {
     private readonly IReadOnlyList<OwnedGame> _games;
@@ -154,8 +152,7 @@ sealed class InMemoryStore : ISyncStore
 
     public void LoadSampleData(IReadOnlyList<SampleGame> games)
     {
-        // Minimal in-memory implementation: upsert owned rows and record matches+features
-        // for matched games. Keeps existing SyncService tests green without a real DB.
+        // In-memory: upsert owned rows and record matches+features for matched games.
         foreach (var g in games)
         {
             _owned[g.AppId] = (g.Name, g.PlaytimeForeverMin, g.Playtime2WeeksMin);
@@ -177,8 +174,6 @@ sealed class InMemoryStore : ISyncStore
         // _notInterested and _log are deliberately left intact (mirrors SQL behaviour).
     }
 }
-
-// ── Tests ─────────────────────────────────────────────────────────────────
 
 public class SyncServiceTests
 {

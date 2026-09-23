@@ -17,17 +17,13 @@ public partial class MainWindow : FluentWindow
         InitializeComponent();
         DataContext = vm;
 
-        // Wire the DI-backed page provider so NavigationView resolves pages from the container
         NavView.SetPageProviderService(pageProvider);
 
         Loaded += (_, _) =>
         {
-            // WPF-UI's NavigationView hosts pages inside a DynamicScrollViewer that measures
-            // content with INFINITE height. That defeats list virtualization (every row realized →
-            // a multi-second freeze on a large library) and leaves pages nothing of their own to
-            // scroll. Disabling that scroller makes it measure pages at the viewport height, so each
-            // page's own ListBox/ScrollViewer virtualizes and scrolls. Do it before the first
-            // navigation so the very first measure is already bounded (no freeze).
+            // WPF-UI's NavigationView hosts pages in a DynamicScrollViewer that measures at INFINITE
+            // height, which defeats list virtualization (multi-second freeze on a large library).
+            // Disabling it bounds each page to the viewport. Do it before the first navigation.
             DisableNavContentScroll();
             NavView.Navigate(typeof(RecommendView));
             // Re-apply after navigation in case the content host was built lazily.

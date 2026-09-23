@@ -18,7 +18,7 @@ Solution `Compass.slnx`, 4-project layering `App → Data → Core → Recommend
 
 Public repo. Everything runs keyless off the
 local SQLite cache (including a baked-in ~40-game sample library via Settings → Load sample
-data). Live Steam/IGDB sync is gated on the owner's own API keys (Steam Web API key, IGDB/Twitch
+data). Live Steam/IGDB sync is gated on Yovan's own API keys (Steam Web API key, IGDB/Twitch
 Client ID+Secret) injected via `dotnet user-secrets` — not present in this environment.
 
 ## Commands
@@ -49,18 +49,16 @@ smoke-launch verification (below) still applies for anything CI can't cover (ren
 
 ## Verification harness
 
-No dedicated `verify/` scripts or screenshot tooling in this repo. Verification uses a
-**smoke-launch** pattern instead of screenshots: launch with a fresh temp `--db`, confirm the
-process stays alive ≥5s with a non-zero `MainWindowHandle` and no XAML-parse crash, then kill
-it. An empty `--db` renders the app's empty-state (expected, not a bug) — populated-page checks
-require the owner to manually run Settings → Load sample data afterward; that step can't be
-automated headlessly.
+No `verify/` scripts or screenshot tooling. Verify with a **smoke launch**: start with a fresh
+temp `--db`, confirm the process stays alive ≥5s with a non-zero `MainWindowHandle` and no
+XAML-parse crash, then kill it. An empty `--db` renders the empty state (expected). Headless
+checks stop at process-alive + handle: populated pages need Yovan to run Settings → Load
+sample data and look.
 
 ## Conventions & safety
 
-- Work on a `feat/compass-vN` branch; land via **fast-forward merge to `main`** (not PR/squash),
-  re-verify build+test on `main` after merging, then push `origin main`, then delete the feature
-  branch. **Pause for owner confirmation before the public push** (standing pre-push rule — this
+- Work on a feature branch and land it through a PR: `gh pr checks <#> --watch`, then
+  `gh pr merge --merge --delete-branch`. **Pause for Yovan's confirmation before the public push** (standing pre-push rule — this
   is a public repo).
 - Commit identity: `yovanmc <yovanmc@users.noreply.github.com>`, plain `git commit` (no
   `-c`/`--author` overrides).
@@ -69,8 +67,7 @@ automated headlessly.
   ...`, `fix(app): ...`, `docs: ...`).
 - **Keep `Compass.Recommender` pure.** No Steam/IGDB/DB/feedback/insights concepts may leak into
   it — new metrics/features orchestrate existing engine primitives from `Compass.Core` instead of
-  adding new ones to the engine itself. This is the one durable architectural constraint checked
-  in every plan.
+  adding new ones to the engine itself. This is the one durable architectural constraint.
 - Never commit secrets. Steam API key / IGDB Client ID+Secret go through `dotnet user-secrets`
   only; SteamID64 is non-secret and lives in `appsettings.json`.
 
@@ -83,7 +80,5 @@ automated headlessly.
   double-count with the existing implicit-negative (`NotInterested`) branch.
 - `Diversity = 0` must reproduce the pre-MMR ranking exactly — the diversity slider re-orders
   results only, it never changes the displayed match score.
-- Large-library performance (scrolling/recompute cost) is fragile. Watch
-  recompute cost when touching the Recommend/Library hot path.
-- Headless app testing is limited to process-alive + handle checks; there is no automated way to
-  verify rendered UI content without the owner eyeballing a populated run.
+- Large-library scrolling and recompute cost is fragile. Watch it on the Recommend/Library hot
+  path.

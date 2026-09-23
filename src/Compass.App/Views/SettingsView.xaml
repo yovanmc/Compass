@@ -44,7 +44,6 @@
                   Padding="32,24,32,32">
         <StackPanel MaxWidth="560" HorizontalAlignment="Left">
 
-            <!-- ── Header ─────────────────────────────────────────────────── -->
             <TextBlock Text="Recommender Settings"
                        Foreground="#EAEAEA"
                        FontSize="20"
@@ -56,14 +55,12 @@
                        TextWrapping="Wrap"
                        Margin="0,0,0,24"/>
 
-            <!-- ── Section: Scoring ───────────────────────────────────────── -->
             <TextBlock Text="SCORING"
                        Foreground="#5F5F5F"
                        FontSize="11"
                        FontWeight="SemiBold"
                        Margin="0,0,0,12"/>
 
-            <!-- Played floor -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -104,7 +101,6 @@
                 </Grid>
             </Border>
 
-            <!-- Neighbors (k) -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -145,7 +141,6 @@
                 </Grid>
             </Border>
 
-            <!-- Scorer mode -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -181,7 +176,6 @@
                 </StackPanel>
             </Border>
 
-            <!-- Hybrid alpha — only visible when Hybrid mode selected -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -221,7 +215,6 @@
                 </Grid>
             </Border>
 
-            <!-- Diversity -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -260,7 +253,6 @@
                 </Grid>
             </Border>
 
-            <!-- Feedback weight -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -299,14 +291,12 @@
                 </Grid>
             </Border>
 
-            <!-- ── Section: Category weights ─────────────────────────────── -->
             <TextBlock Text="CATEGORY WEIGHTS"
                        Foreground="#5F5F5F"
                        FontSize="11"
                        FontWeight="SemiBold"
                        Margin="0,18,0,12"/>
 
-            <!-- Genre weight -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -340,7 +330,6 @@
                 </Grid>
             </Border>
 
-            <!-- Theme weight -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -374,7 +363,6 @@
                 </Grid>
             </Border>
 
-            <!-- Mode weight -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -408,7 +396,6 @@
                 </Grid>
             </Border>
 
-            <!-- Keyword weight -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -442,14 +429,12 @@
                 </Grid>
             </Border>
 
-            <!-- ── Section: Negative signals ──────────────────────────────── -->
             <TextBlock Text="NEGATIVE SIGNALS"
                        Foreground="#5F5F5F"
                        FontSize="11"
                        FontWeight="SemiBold"
                        Margin="0,18,0,12"/>
 
-            <!-- Negative weight -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -488,7 +473,6 @@
                 </Grid>
             </Border>
 
-            <!-- Use implicit negatives -->
             <Border Background="#0F0F0F"
                     BorderBrush="#222" BorderThickness="1"
                     CornerRadius="6"
@@ -517,7 +501,6 @@
                 </Grid>
             </Border>
 
-            <!-- ── Reset button ───────────────────────────────────────────── -->
             <Button Command="{Binding ResetCommand}"
                     Style="{StaticResource ChromelessButton}"
                     Cursor="Hand"
@@ -530,7 +513,6 @@
                            Foreground="#8A8A8A"/>
             </Button>
 
-            <!-- ── Section: Data ─────────────────────────────────────────── -->
             <TextBlock Text="DATA"
                        Foreground="#5F5F5F"
                        FontSize="11"
@@ -544,7 +526,6 @@
                        Margin="0,0,0,12"/>
 
             <StackPanel Orientation="Horizontal">
-                <!-- Load sample data -->
                 <Button Command="{Binding LoadSampleDataCommand}"
                         Style="{StaticResource ChromelessButton}"
                         Cursor="Hand"
@@ -556,7 +537,6 @@
                                Foreground="#8A8A8A"/>
                 </Button>
 
-                <!-- Clear library -->
                 <Button Command="{Binding ClearLibraryCommand}"
                         Style="{StaticResource ChromelessButton}"
                         Cursor="Hand"

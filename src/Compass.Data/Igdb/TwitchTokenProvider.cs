@@ -15,7 +15,6 @@ public sealed class TwitchTokenProvider
 
     public async Task<string> GetTokenAsync(CancellationToken ct)
     {
-        // Fast path: token still valid
         if (_token is not null && DateTimeOffset.UtcNow < _expiresAt) return _token;
 
         await _gate.WaitAsync(ct);

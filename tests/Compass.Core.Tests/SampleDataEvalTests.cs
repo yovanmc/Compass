@@ -18,8 +18,6 @@ public class SampleDataEvalTests
 
     public SampleDataEvalTests(ITestOutputHelper output) => _output = output;
 
-    // ── Fixture ────────────────────────────────────────────────────────────────
-
     private const int PlayedFloor = 120; // minutes — same as app default
 
     /// <summary>
@@ -27,12 +25,10 @@ public class SampleDataEvalTests
     /// </summary>
     private const int TopN = 10;
 
-    // ── Leave-One-Out Recall@10 ────────────────────────────────────────────────
-
     /// <summary>
     /// For each played game, hold it out and verify the recommender surfaces it in
     /// the top-10 when it competes against the full backlog. Measures whether the
-    /// engine recognises the owner's taste profile against a realistic candidate pool.
+    /// engine recognises the user's taste profile against a realistic candidate pool.
     ///
     /// Observed value: 0.8750 (14/16 played items retrieved in top-10 with shared pool).
     /// Floor set at 0.60 — comfortably below observed to allow fixture tweaks while
@@ -53,13 +49,10 @@ public class SampleDataEvalTests
         _output.WriteLine($"LeaveOneOutRecallAt10: {recall:F4} " +
                           $"(liked={liked.Count}, backlog={backlog.Count})");
 
-        // Observed: 0.8750 (14/16). Floor: 0.60.
         recall.Should().BeGreaterThanOrEqualTo(0.60,
             $"recall@10={recall:F4} is below the 0.60 quality floor " +
             "(observed ~0.875 on the baked-in fixture)");
     }
-
-    // ── Intra-List Diversity: Diversity=0 vs Diversity=0.5 ───────────────────
 
     /// <summary>
     /// Verifies that MMR re-ranking (Diversity=0.5) produces intra-list diversity
@@ -86,7 +79,6 @@ public class SampleDataEvalTests
         var baseResult = recommender.Recommend(liked, backlog, baseOptions);
         var mmrResult  = recommender.Recommend(liked, backlog, mmrOptions);
 
-        // Extract feature vectors for the top-N recommendations.
         var baseVectors = baseResult.Recommendations
             .Take(TopN)
             .Select(r => backlog.First(c => c.ItemId == r.ItemId).Features)
@@ -103,8 +95,6 @@ public class SampleDataEvalTests
         _output.WriteLine($"IntraListDiversity  base (δ=0.0): {baseDiversity:F4}");
         _output.WriteLine($"IntraListDiversity  mmr  (δ=0.5): {mmrDiversity:F4}");
 
-        // Both must clear the absolute floor.
-        // Observed: base 0.5783, mmr 0.6440. Floor: 0.40.
         baseDiversity.Should().BeGreaterThanOrEqualTo(0.40,
             $"base diversity {baseDiversity:F4} is below floor 0.40 " +
             "(observed 0.5783; indicates the fixture is too homogeneous)");
@@ -113,7 +103,6 @@ public class SampleDataEvalTests
             $"mmr diversity {mmrDiversity:F4} is below floor 0.40 " +
             "(observed 0.6440)");
 
-        // MMR must not make diversity worse.
         mmrDiversity.Should().BeGreaterThanOrEqualTo(baseDiversity,
             $"MMR (δ=0.5) diversity {mmrDiversity:F4} < base {baseDiversity:F4}; " +
             "re-ranking should never reduce intra-list variety");
