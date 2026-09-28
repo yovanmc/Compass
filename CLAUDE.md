@@ -44,8 +44,10 @@ dotnet user-secrets set "Igdb:ClientId"     "..."
 dotnet user-secrets set "Igdb:ClientSecret" "..."
 ```
 
-CI runs via `.github/workflows/ci.yml` (build + test on push/PR). Manual
+CI builds and tests on push/PR (the Test gate line below). Manual
 smoke-launch verification (below) still applies for anything CI can't cover (rendered UI content).
+
+Test gate: `.github/workflows/ci.yml` · whole · ci · 1.4 min [V 2026-09-28 4a1e40dc]
 
 ## Verification harness
 
