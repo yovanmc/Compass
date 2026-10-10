@@ -1,10 +1,10 @@
 # Compass — North Star
 
 ## What this builds up to be (end-state vision)
-**Compass, finished, is a standalone occasional-use game picker that shares its extracted recommender core with Curio.** Two decisions define the end state:
+**Compass, finished, is a standalone occasional-use game picker built around a pure, reusable recommender core.** Two decisions define the end state:
 
-- **Standalone product, permanently.** Compass remains a living app for "what do I play tonight" even after Curio integrates the recommender for media — games and media library are distinct use cases with distinct feature vectors. It does not get absorbed or archived as a donor.
-- **The core gets extracted for real.** Curio's end-state vision names the Compass pure-recommender core as its media-recommendation engine. That makes **two consumers**, which is exactly the standing trigger for the NuGet/shared-library extraction — so the extraction genuinely happens at that Curio milestone, and `Compass.Recommender`'s purity rule becomes a shared-library contract, not just project hygiene.
+- **Standalone product, permanently.** Compass is a living app for "what do I play tonight". It does not get absorbed or archived as a donor.
+- **The core stays in this solution.** Curio does not consume the recommender and no other consumer is planned, so `Compass.Recommender` stays a project here and its purity rule stays project hygiene.
 - **Finished Compass, concretely:** live pull verified and working; the real backlog in the DB; recommendations trusted enough that Yovan actually consults it on game nights; relevance feedback tuning the model over time. Small, done, occasionally used — like a good kitchen tool.
 - **Never:** multi-store aggregation, social features, non-Steam sources, portfolio positioning.
 
@@ -18,8 +18,6 @@ Smallest path in the portfolio. The park governs timing; this is the whole remai
 **Step 2 — U1: short real-usage window.** Use it on a few game nights; log friction; nothing speculative.
 
 **Step 3 — v6: friction fixes only**, seeded by U1. Then Compass is functionally v-final as an app: dormant-but-working, consulted on game nights, relevance feedback slowly tuning the model.
-
-**Step 4 — The extraction milestone (triggered by Curio, not by Compass).** When Curio's Phase-4 recommender integration begins, extract `Compass.Recommender` into a shared library (two consumers now exist — the standing trigger fires); Compass becomes consumer #1 of the shared package; purity rule becomes the library's contract. Why Curio-triggered: extraction before a second consumer is speculative packaging — the standing decision holds until the trigger is real.
 
 **Maintenance forever after:** nothing, unless it breaks on a game night.
 

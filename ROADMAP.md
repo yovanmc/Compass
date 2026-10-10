@@ -11,8 +11,8 @@ played, and recommends what to play next from the unplayed backlog. C#/.NET 10 W
 games, only feature vectors + affinities) meant for reuse in other projects.
 **Status: PARKED ENTIRELY.** No development, nothing queued. The one sanctioned action while parked is
 the single ~30-min v5 live-pull verification session. Read `NORTHSTAR.md` before planning.
-**Vision:** a standalone occasional-use game picker ("what do I play tonight") whose pure recommender
-core is extracted into a shared library once Curio integrates it as the second consumer.
+**Vision:** a standalone occasional-use game picker ("what do I play tonight") built around its pure
+recommender core.
 **Purpose:** a daily-use tool, NOT a portfolio artifact. Features beyond fixes wait for usage evidence.
 Repo: github.com/yovanmc/Compass (PUBLIC) · this clone: `C:\Agent Projects\Compass`.
 
@@ -23,7 +23,6 @@ Repo: github.com/yovanmc/Compass (PUBLIC) · this clone: `C:\Agent Projects\Comp
 | v5 | Live-pull verification | [ ] | DEFERRED: project parked, this is the one sanctioned action | — | Keys wired, real pull has NEVER run. Verify Steam auth + library fetch, IGDB auth, appID match-rate, `external_games category=1` mapping. Fix whatever breaks. Run-and-fix milestone |
 | U1 | Usage window (~3 weeks) | [ ] | BLOCKED: v5 | — | Use Compass at real "what do I play tonight" moments. Friction/perf/bugs logged as the v6 backlog. Usage-before-features gate |
 | v6 | Usage-fed fixes (perf + bugs) | [ ] | BLOCKED: U1 | — | Backlog = the U1 log only. Speculative perf work declined |
-| X | Recommender extraction | [ ] | BLOCKED: Curio recommender integration begins | — | Extract `Compass.Recommender` into a shared library once a second consumer exists. Compass becomes consumer #1 and the purity rule becomes the library contract |
 | H | Remote branch cleanup | [ ] | BACKLOG | — | Delete merged remote branches (`ci/github-actions`, `docs/how-this-was-built`, `docs/roadmap-onboarding`, `docs/northstar-2026-07`, `chore/current-state-docs`, `chore/prompt-audit-2026-09-23`) and resolve the unmerged `docs/quiet-build` and `chore/single-file-publish` branches. Batch with any future touch |
 
 ## Pointers
